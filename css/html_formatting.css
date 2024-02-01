@@ -1,0 +1,249 @@
+.info {
+	padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+
+.info h4 {
+	margin: 0 0 5px;
+	color: #777;
+	font-size: 18px;
+}
+
+.legend {
+	text-align: left;
+	line-height: 18px;
+	color: #555;
+}
+.legend i {
+	width: 18px;
+	height: 18px;
+	float: left;
+	margin-right: 8px;
+	opacity: 0.7;
+}
+	
+.legend2 {
+    padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.9);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+	font-size: 12px;
+	text-align: left;
+   }
+
+h3, h4, h5 { 
+	font-weight: bold;
+}
+
+h5 {
+	font-size: 15px;
+}
+
+div{
+	z-index:5;
+}
+
+.cosite{
+	float: left;
+	padding: 16px 0;
+}
+
+.table{
+	margin-bottom: 0px;
+	font-size: 14px;
+}
+
+#aadt_table th{
+	text-align: center;
+	color: #EF6950;
+	padding-bottom: 1%;
+}
+
+th.proj_table, th.head-nchrp{
+	text-align: center;
+	font-size: 13px;
+}
+
+th.growth{
+	background-color: rgba(220,220,220,0.2); 
+}
+
+th.aadt, th.growth{
+	font-style: italic;
+	text-align: center;
+}
+
+td, th.growth, th.aadt{
+	font-size: 12px;
+}
+
+td.year{
+	text-align: center;
+	font-weight: bold;
+}
+
+td.analysisYear, td.est_growth{
+	text-align: center;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+td.aadt, td.growth {
+	text-align: right;
+}
+
+th.est_sel, td.sel_year, .kfac, td.m4, th.m4{
+	color: #1D6F42;
+}
+th.est_five, td.five_year, td.m5a, th.m5a, td.m5a-r, th.m5a-r{
+	color: orange;
+}
+th.est_ten, td.ten_year, .dfac, td.m5b, th.m5b, td.m5b-r, th.m5b-r{
+	color: #EF6950;
+}
+th.est_tbrpm, td.tbrpm, .tfac, td.m6, th.m6, td.m6-r, th.m6-r{
+	color: #008CC4;
+}
+
+td.aadt_flag{
+	text-align: center;
+}
+
+
+#script_legend{
+	text-align: center;
+	color:#000000;
+	font: 10px;
+}
+
+#nchrp_procedure_table, #aadt_projection_table{
+	text-align: center;
+	font-weight: bold;
+}
+
+#aadt_projection_table tr td:nth-child(1){
+	text-align: left;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+.legendmap{
+	position: absolute;
+	width: 20%;
+	top: 90%;
+	bottom: 0;
+	
+	}
+	
+.legend { list-style: none; }
+.legend li { float: left;  clear: both; }
+.legend span {border: 1px solid #000000; float: left;width: 12px; height: 12px; border-radius: 50% ; margin:2px;}
+	/* your colors */
+.legend .fdotCount { background-color: #F7A53C; }
+.legend .countyCount { background-color: #40B7F2; }
+.legend .studyCount { background-color: #93C572; }
+
+
+
+#nchrp_procedure_table tr td:nth-child(1){
+	text-align: left;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+th.head-nchrp{
+	text-align: center;
+}
+
+#kdt, #analysis-year{
+	text-align: center;
+	font-weight: bold;
+}
+
+#kdt th{
+	font-size: 12px;
+}
+
+#analysis-year th{
+	font-size: 12px;
+}
+
+.map{
+	position: absolute;
+	width: 25%;
+	top: 72px;
+	bottom: 0;
+}
+
+.box_cosite{
+	position: absolute;
+	left: 26%;
+	width: 17%;
+	top: 60px;
+	height: 40px;
+}
+
+#historical-aadt-table{
+	position: absolute;
+	left: 26%;
+	width: 17%;
+	top: 98px;
+	bottom: 0;
+	padding: 0 5px;
+	zoom: 92%;
+}
+
+#historical-aadt-table tr:nth-child(even) {
+  background-color: #FAFAFA;
+}
+
+
+#cosite, #chartsta{
+	font-weight: bold;
+	font-size: 17px;
+}
+
+#canvas-container-3 {
+	width: 80%;
+    text-align: center;
+	margin: auto;
+}
+
+.container{
+	position: absolute;
+	left: 45%;
+	width: 55%;
+	top: 70px;
+	bottom: 0;
+}
+
+.nav-pills{
+	padding: 1px 0;
+}
+
+.nav{
+	width:100%;
+}
+
+form{
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+
+html, body {
+    height:100%;
+    width:100%;
+    margin:0;
+    padding:0;
+	overflow: hidden;
+}
+

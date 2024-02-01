@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Traffic Projection Tool</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width">
+
+<!--Load jQuery-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+
+
+<!-- SEARCH CONTROL -->
+	<link rel="stylesheet" href="../src/leaflet-search.css"/>
+
+
+<!-- Chart.js -->	
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.min.js"></script>
+	
+	<link rel="stylesheet" href="../leaflet/leaflet.css"/>
+	<script src="../leaflet/leaflet.js"></script> 
+	<script src="../js/l.control.geosearch.js"></script>
+	<script src="../js/l.geosearch.provider.google.js"></script>
+    <link rel="stylesheet" href="../css/l.geosearch.css"/>
+	
+<!-- Main Style -->
+    <link rel="stylesheet" href="../css/html_formatting.css"/>
+
+<!-- Geojson -->
+<!-- NOTE_: Update the geojson file name below -->
+	<script type="text/javascript" src="../geojson/Visualizer_08012023.geojson"></script>
+
+</head>
+<body>
+	<header class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+		<nav class="container-xxl flex-wrap flex-md-nowrap" aria-label="Main navigation">
+			<a href="https://tdaappsprod.dot.state.fl.us/fto/" target="_blank">
+				<img src="../images/fdot_logo_white.png" id="fdot_logo" style="height: 45px; float:left"/>
+			</a>
+		<div class="collapse navbar-collapse" id="bdNavbar">
+			<ul class="navbar-nav flex-row flex-wrap bd-navbar-nav pt-2 py-md-0">
+				<li class="nav-item col-6 col-md-auto">
+					<!-- NOTE_: Update the html file name -->
+					<a class="nav-link p-3 active" aria-current="true" href="D1_aadt_proj_v1.html"><b>Traffic Projection Tool </b><em>&nbsp(based on D1RPM)</em></a>
+				</li>
+			</ul>
+			<ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+				<li class="nav-item col-6 col-md-auto">
+					<a href="https://bcceng.com/" target="_blank"><img src="../images/bcc_logo.png" id="bcc_logo" style="height: 45px;"/></a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<!-- <a class="contactlink" id="contactlink" aria-current="true" href="https://bccorlando.wixsite.com/forum" target="_blank" style="color: white;"><b>Feedback</b></a>&nbsp -->
+	<!-- <button type="reset" onclick="document.location.reload()">RESET</button> -->
+	</header>
+
+	<!-- Map-->	
+	<div class="map" id="map">
+	</div>
+
+	<div class="legendmap" id="legendmap">
+		<ul class="legend" id="script_legend">
+			<!-- NOTE_: this are the count layers, comment out if not needed -->
+			<!-- NOTE_:  since we don't have county or study count just yet, we will comment out -->
+			<li><span class="fdotCount"></span> FDOT Count</li>
+			<!-- <li><span class="countyCount"></span> County Count</li> -->
+			<!-- <li><span class="studyCount"></span> Study Count</li> -->
+		</ul>
+	</div>	
+
+
+	<div class="box_cosite">
+		<div class="cosite" id="cosite"><i>Cosite Number:</i>&nbsp;</div>
+		<div class="cosite" id="chartsta" style="color: #EF6950;"></div>
+	</div>
+
+
+	<!-- FTO HISTORICAL AADT Table-->
+	<div id="historical-aadt-table">
+		<table class="table" id="aadt_table">
+			<thead>
+			<tr>
+				<th class="aadt_table"></th>
+				<th class="aadt_table" style="width: 15%;">Year</th>
+				<th class="aadt_table" style="text-align: right; width: 25%;">AADT</th>
+				<th class="aadt_table" style="width: 25%;">Flag</th>
+				<th class="aadt_table" style="text-align: right; width: 25%;">Growth</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2001"/></td>
+				<td class="year">2001</td>
+				<td class="aadt" id="2001c">0</td>
+				<td class="aadt_flag" id="2001f">0</td>
+				<td class="growth" id='2001g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2002"/></td>
+				<td class="year">2002</td>
+				<td class="aadt" id='2002c'>0</td>
+				<td class="aadt_flag" id="2002f">0</td>
+				<td class="growth" id='2002g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2003"/></td>
+				<td class="year">2003</td>
+				<td class="aadt" id='2003c'>0</td>
+				<td class="aadt_flag" id="2003f">0</td>
+				<td class="growth" id='2003g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2004"/></td>
+				<td class="year">2004</td>
+				<td class="aadt" id='2004c'>0</td>
+				<td class="aadt_flag" id="2004f">0</td>
+				<td class="growth" id='2004g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2005"/></td>
+				<td class="year">2005</td>
+				<td class="aadt" id='2005c'>0</td>
+				<td class="aadt_flag" id="2005f">0</td>
+				<td class="growth" id='2005g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2006"/></td>
+				<td class="year">2006</td>
+				<td class="aadt" id='2006c'>0</td>
+				<td class="aadt_flag" id="2006f">0</td>
+				<td class="growth" id='2006g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2007"/></td>
+				<td class="year">2007</td>
+				<td class="aadt" id='2007c'>0</td>
+				<td class="aadt_flag" id="2007f">0</td>
+				<td class="growth" id='2007g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2008"/></td>
+				<td class="year">2008</td>
+				<td class="aadt" id='2008c'>0</td>
+				<td class="aadt_flag" id="2008f">0</td>
+				<td class="growth" id='2008g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2009"/></td>
+				<td class="year">2009</td>
+				<td class="aadt" id='2009c'>0</td>
+				<td class="aadt_flag" id="2009f">0</td>
+				<td class="growth" id='2009g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2010"/></td>
+				<td class="year">2010</td>
+				<td class="aadt" id='2010c'>0</td>
+				<td class="aadt_flag" id="2010f">0</td>
+				<td class="growth" id='2010g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2011"/></td>
+				<td class="year">2011</td>
+				<td class="aadt" id='2011c'>0</td>
+				<td class="aadt_flag" id="2011f">0</td>
+				<td class="growth" id='2011g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2012"/></td>
+				<td class="year">2012</td>
+				<td class="aadt" id='2012c'>0</td>
+				<td class="aadt_flag" id="2012f">0</td>
+				<td class="growth" id='2012g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2013"/></td>
+				<td class="year">2013</td>
+				<td class="aadt" id='2013c'>0</td>
+				<td class="aadt_flag" id="2013f">0</td>
+				<td class="growth" id='2013g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2014"/></td>				
+				<td class="year">2014</td>
+				<td class="aadt" id='2014c'>0</td>
+				<td class="aadt_flag" id="2014f">0</td>
+				<td class="growth" id='2014g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2015"/></td>
+				<td class="year">2015</td>
+				<td class="aadt" id='2015c'>0</td>
+				<td class="aadt_flag" id="2015f">0</td>
+				<td class="growth" id='2015g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2016"/></td>
+				<td class="year">2016</td>
+				<td class="aadt" id='2016c'>0</td>
+				<td class="aadt_flag" id="2016f">0</td>
+				<td class="growth" id='2016g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2017"/></td>
+				<td class="year">2017</td>
+				<td class="aadt" id='2017c'>0</td>
+				<td class="aadt_flag" id="2017f">0</td>
+				<td class="growth" id='2017g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2018"/></td>
+				<td class="year">2018</td>
+				<td class="aadt" id='2018c'>0</td>
+				<td class="aadt_flag" id="2018f">0</td>
+				<td class="growth" id='2018g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2019"/></td>
+				<td class="year">2019</td>
+				<td class="aadt" id='2019c'>0</td>
+				<td class="aadt_flag" id="2019f">0</td>
+				<td class="growth" id='2019g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2020"/></td>
+				<td class="year">2020</td>
+				<td class="aadt" id='2020c'>0</td>
+				<td class="aadt_flag" id="2020f">0</td>
+				<td class="growth" id='2020g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2021"/></td>
+				<td class="year">2021</td>
+				<td class="aadt" id='2021c'>0</td>
+				<td class="aadt_flag" id="2021f">0</td>
+				<td class="growth" id='2021g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2022"/></td>
+				<td class="year">2022</td>
+				<td class="aadt" id='2022c'>0</td>
+				<td class="aadt_flag" id="2022f">0</td>
+				<td class="growth" id='2022g'>0</td>
+			</tr>
+			<tr>
+				<td class="checker"><input type="checkbox" id="check_2023"/></td>
+				<td class="year">2023</td>
+				<td class="aadt" id='2023c'>0</td>
+				<td class="aadt_flag" id="2023f">0</td>
+				<td class="growth" id='2023g'>0</td>
+			</tr>
+			</tbody>
+		</table>
+		
+		<table class="table" id="kdt">
+			<thead>
+			<tr>
+				<th class="kfac" style="width:33%">2022 K Factor</th>
+				<th class="dfac" style="width:34%">2022 D Factor</th>
+				<th class="tfac" style="width:33%">2022 T Factor</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td class="kfac" id="k_fac">0</td>
+				<td class="dfac" id="d_fac">0</td>
+				<td class="tfac" id="t_fac">0</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Tabs for Data Charts and Tables-->
+	<div class="container">
+	
+	<ul class="nav nav-pills" id="pills-tab" role="tablist">
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" type="button" aria-expanded="false" style="color: black;">Count Source</a>
+			<ul class="dropdown-menu">
+				<!-- NOTE_: update html file names, comment out layers that are not in use -->
+			  <li><a class="dropdown-item" href="D1_aadt_proj_v1-FDOT.html">FDOT Count</a></li>
+			  <!-- <li><a class="dropdown-item" href="D1_aadt_proj_v1-COUNTY.html">County Count</a></li> -->
+			  <!-- <li><a class="dropdown-item" href="D1_aadt_proj_v1-STUDY.html">Study Count</a></li> -->
+			</ul>
+		</li>
+	</ul>
+		<ul class="nav nav-pills" id="pills-tab" role="tablist">
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active" id="pills-historical-tab" data-bs-toggle="pill" data-bs-target="#historical-chart" type="button" role="tab" aria-controls="pills-home" aria-selected="true" style="font-weight: bold">Historical AADT</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="pills-aadt-tab" data-bs-toggle="pill" data-bs-target="#historical-data-projection" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" style="font-weight: bold">AADT Projection</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="pills-nchrp-tab" data-bs-toggle="pill" data-bs-target="#nchrp-projection" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" style="font-weight: bold">NCHRP Procedure</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="pills-esal-tab" data-bs-toggle="pill" data-bs-target="#input-18kip" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" style="font-weight: bold; color: #f74a2c; background-color: white;">ESAL Analysis Input</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="pills-bebr-tab" data-bs-toggle="pill" data-bs-target="#bebr" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" style="font-weight: bold; color: #000000; background-color: white;">BEBR Growth</button>
+		</li>
+    </ul>
+	
+	<table class="table" id="analysis-year">
+		<thead>
+		<tr>
+			<th class="analysis-year" style="width:11%">Base Year</th>
+			<th class="analysis-year" style="width:11%;">Base Year AADT</th>
+			<th class="analysis-year" style="width:11%">Opening Year</th>
+			<th class="analysis-year" style="width:11%">Interim Year</th>
+			<th class="analysis-year" style="width:11%">Design Year</th>
+			<th class="analysis-year" style="width:22%;">Base Year Model Volume (PSWADT)</th>
+			<th class="analysis-year" style="width:22%;">Future Year Model Volume (PSWADT)</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td class="analysis-year">
+				<input type="number" id="input_ExistingYear" step="1" min="2000" max="2023" value="2022" onchange="saveValue(this);">
+			</td>
+			<td class="manual-aadt">
+				<input type="number" style="border:1px solid; background-color: #FFEB9C; border-radius: 2px; font-weight: bold;" id="input_AADT" step="100" min="0" max="9999999" onchange="saveValue(this);">
+			</td>
+			<td class="analysis-year">
+				<input type="number" id="input_OpeningYear" step="1" min="2000" max="9999" value="2025" onchange="saveValue(this);">
+			</td>
+			<td class="analysis-year">
+				<input type="number" id="input_InterimYear" step="1" min="2000" max="9999" value="2035" onchange="saveValue(this);">
+			</td>			
+			<td class="analysis-year">
+				<input type="number" id="input_DesignYear" step="1" min="2000" max="9999" value="2045" onchange="saveValue(this);">
+			</td>
+			<td class="analysis-year">
+				<input type="number" style="border:1px solid; background-color: #FFEB9C; border-radius: 2px; font-weight: bold;" id="input_BaseVolume" step="1000" min="0" max="9999999" onchange="saveValue(this);">
+			</td>			
+			<td class="analysis-year">
+				<input type="number" style="border:1px solid; background-color: #FFEB9C; border-radius: 2px; font-weight: bold;" id="input_FutureVolume" step="1000" min="0" max="9999999" onchange="saveValue(this);">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	
+	
+	<div class="tab-content" id="pills-tabContent">
+		
+		<div class="tab-pane fade show active" id="historical-chart" role="tabpanel" aria-labelledby="pills-home-tab">
+			<div id="historical_aadt">
+				<div><h5 style="padding: 10px 0;"><i>FTO Historical AADT Chart (2000-2023)</i></h5></div>
+				<div style="padding-bottom: 10px;" id="historical_aadt_chart" class="btn-group" role="group" aria-label="Basic example">
+					<button type="button" class="btn btn-outline-primary btn-sm" onclick="download_csv_1('aadt_table');">Export</button>
+					<button type="button" class="btn btn-outline-primary btn-sm" onclick="selectElementContents(document.getElementById('aadt_table'));">Copy</button>
+				</div>
+				<canvas id="myChart" height="120"></canvas>
+			</div>
+		</div>
+		
+		<div class="tab-pane fade" id="historical-data-projection" role="tabpanel" aria-labelledby="pills-profile-tab">	
+			<div id="aadt_projection_trend_line">
+				<h5 style="padding-top: 10px;"><i>AADT Projection Trend Line (2000-2050)</i></h5>
+				<canvas id="projChart" height="115" style="margin-bottom: 20px;"></canvas>
+			</div>
+			<table class="table" id="aadt_projection_table">
+				<thead>
+					<tr>
+						<p style="font-size: 80%; text-align: center; color:rgb(73, 73, 73);"><i>Note: * The original base AADT or adopted model volumes have been revised by the user. Please use the output with caution.</i></p>
+						<th class="proj_table" style="vertical-align: middle;">
+							<div class="btn-group" role="group" aria-label="Basic example">
+								<button type="button" class="btn btn-outline-primary btn-sm" onclick="download_csv_2('aadt_projection_table');">Export</button>
+								<button type="button" class="btn btn-outline-primary btn-sm" onclick="selectElementContents(document.getElementById('aadt_projection_table'));">Copy</button>
+							</div>
+						</th>
+						<th class="est_sel proj_table" style="width: 20%">Based on Selected AADTs</th>
+						<th class="est_five proj_table" style="width: 22%">Based on the Last 5-Year AADTs</th>
+						<th class="est_ten proj_table" style="width: 23%">Based on the Last 10-Year AADTs</th>
+						<th class="est_tbrpm proj_table" style="width: 18%">Based on TBRPM Volume</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td class="est_growth">Annual Growth</td>
+					<td class="sel_year" id="growth_selectedyr"></td>
+					<td class="five_year" id="growth_5yr"></td>
+					<td class="ten_year" id="growth_10yr"></td>
+					<td class="tbrpm" id="growth_tbrpm"></td>
+				</tr>
+				<tr>
+					<td class="analysisYear" id="chart2-opening">Opening Year</td>
+					<td class="sel_year" id="opening_aadt_selectedyr"></td>
+					<td class="five_year" id="opening_aadt_5yr"></td>
+					<td class="ten_year" id="opening_aadt_10yr"></td>
+					<td class="tbrpm" id="opening_aadt_tbrpm"></td>
+				</tr>
+				<tr>
+					<td class="analysisYear" id="chart2-interim">Interim Year</td>
+					<td class="sel_year" id="interim_aadt_selectedyr"></td>
+					<td class="five_year" id="interim_aadt_5yr"></td>
+					<td class="ten_year" id="interim_aadt_10yr"></td>
+					<td class="tbrpm" id="interim_aadt_tbrpm"></td>
+				</tr>
+				<tr>
+					<td class="analysisYear" id="chart2-design">Design Year</td>
+					<td class="sel_year" id="design_aadt_selectedyr"></td>
+					<td class="five_year" id="design_aadt_5yr"></td>
+					<td class="ten_year" id="design_aadt_10yr"></td>
+					<td class="tbrpm" id="design_aadt_tbrpm"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane fade" id="nchrp-projection" role="tabpanel" aria-labelledby="pills-profile-tab">
+			<div id="nchrp_aadt_projection">
+				<h5 style="padding-top: 10px;"><i>NCHRP AADT Projection</i></h5>
+				<div id="canvas-container-3"><canvas id="nchrpChart" height="135"></canvas></div>
+			</div>
+			
+			<table class="table" id="nchrp_procedure_table">
+				<thead>
+					<tr>
+						<p style="font-size: 80%; text-align: center; color:rgb(73, 73, 73);"><i>Note: * The original base AADT or adopted model volumes have been revised by the user. Please use the output with caution.</i></p>
+						<th rowspan="2" class="head-nchrp" style="vertical-align: bottom;">
+							<div class="btn-group" role="group" aria-label="Basic example">
+								<button type="button" class="btn btn-outline-primary btn-sm" onclick="download_csv_3('nchrp_procedure_table');">Export</button>
+								<button type="button" class="btn btn-outline-primary btn-sm" onclick="selectElementContents(document.getElementById('nchrp_procedure_table'));">Copy</button>
+							</div>
+						</th>
+						
+						<th class="head-nchrp" colspan="6" style="background-color: rgba(220,220,220,0.4); vertical-align: middle;">NCHRP 765 <i>(Based on <u>Base Year</u>)</i></th>
+					</tr>
+					<tr>
+						<th class="head-nchrp m5a" style="width: 12%;">Difference</th>
+						<th class="head-nchrp m5a-r" style="width: 12%;">Difference (rounded)</th>
+						<th class="head-nchrp m5b" style="width: 12%;">Ratio</th>
+						<th class="head-nchrp m5b-r" style="width: 12%;">Ratio (rounded)</th>
+						<th class="head-nchrp m6" style="width: 12%;">Ratio & Difference</th>
+						<th class="head-nchrp m6-r" style="width: 20%;">Ratio & Difference (rounded)</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>Annual Growth</td>
+					<td class="m5a" id="m5a-growth"></td>
+					<td class="m5a-r" id="m5a-r-growth"></td>
+					<td class="m5b" id="m5b-growth"></td>
+					<td class="m5b-r" id="m5b-r-growth"></td>
+					<td class="m6" id="m6-growth"></td>
+					<td class="m6-r" id="m6-r-growth"></td>
+				</tr>
+				<tr>
+					<td id="chart3-opening">Opening Year</td>
+					<td class="m5a" id="m5a-opening"></td>
+					<td class="m5a-r" id="m5a-r-opening"></td>
+					<td class="m5b" id="m5b-opening"></td>
+					<td class="m5b-r" id="m5b-r-opening"></td>
+					<td class="m6" id="m6-opening"></td>
+					<td class="m6-r" id="m6-r-opening"></td>
+				</tr>
+				<tr>
+					<td id="chart3-interim">Interim Year</td>
+					<td class="m5a" id="m5a-interim"></td>
+					<td class="m5a-r" id="m5a-r-interim"></td>
+					<td class="m5b" id="m5b-interim"></td>
+					<td class="m5b-r" id="m5b-r-interim"></td>
+					<td class="m6" id="m6-interim"></td>
+					<td class="m6-r" id="m6-r-interim"></td>
+				</tr>
+				<tr>
+					<td id="chart3-design">Design Year</td>
+					<td class="m5a" id="m5a-design"></td>
+					<td class="m5a-r" id="m5a-r-design"></td>
+					<td class="m5b" id="m5b-design"></td>
+					<td class="m5b-r" id="m5b-r-design"></td>
+					<td class="m6" id="m6-design"></td>
+					<td class="m6-r" id="m6-r-design"></td>
+				</tr>				
+				</tbody>
+			</table>	
+		</div>
+
+		<div class="tab-pane fade" id="input-18kip" role="tabpanel" aria-labelledby="pills-profile-tab">
+			<div id="esal-table">
+			<table class="table" id="18kip_table" style="width: 80%;margin-left:auto;margin-right:auto;margin-top: 50px;">
+				<thead>
+					<tr>	
+						<th class="head-18kip" colspan="4" style="background-color: rgba(220,220,220,0.4); vertical-align: middle;"><i>ESAL Analysis Input</i></th>
+					</tr>
+					<tr>
+						<th class="head-18kip yr" style="width: 20%;"></th>
+						<th class="head-18kip yr" style="width: 20%;">Year</th>
+						<th class="head-18kip tc" style="width: 30%;">Traffic Count (AADT) based on Selected AADTs</th>
+						<th class="head-18kip tc" style="width: 30%;">Traffic Count (AADT) based on NCRPH 765 Ratio & Difference</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td><b>Existing Year</b></td>
+					<td class="year-1" id="year-1"></td>
+					<td class="count-s-1" id="count-s-1"></td>
+					<td class="count-1" id="count-1"></td>
+				</tr>
+				<tr>
+					<td><b>Opening Year</b></td>
+					<td class="year-2" id="year-2"></td>
+					<td class="count-s-2" id="count-s-2"></td>
+					<td class="count-2" id="count-2"></td>
+				</tr>
+				<tr>
+					<td><b>Mid-Year</b></td>
+					<td class="year-3" id="year-3"></td>
+					<td class="count-s-3" id="count-s-3"></td>
+					<td class="count-3" id="count-3"></td>
+				</tr>
+				<tr>
+					<td><b>Design Year</b></td>
+					<td class="year-4" id="year-4"></td>
+					<td class="count-s-4" id="count-s-4"></td>
+					<td class="count-4" id="count-4"></td>
+				</tr>				
+				</tbody>
+			</table>
+			
+			<table class="table2" id="info_table" style="width:60%;margin-left:100px;margin-top:50px;">
+				<tbody>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Base Year Model Number of Lanes (per direction)</b></td>
+					<td class="basenumlanes" id="basenumlanes" style="font-size: 12; text-align: left;"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Future Year Model Number of Lanes (per direction)</b></td>
+					<td style="font-size: 12; text-align: left;" class="futurenumlanes" id="futurenumlanes"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Base Year Model Facility Type</b></td>
+					<td style="font-size: 12; text-align: left;" class="basefacltype" id="basefacltype"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Future Year Model Facility Type</b></td>
+					<td style="font-size: 12; text-align: left;" class="futurefacltype" id="futurefacltype"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Base Year Model Facility Type Category</b></td>
+					<td style="font-size: 12; text-align: left;" class="baseftcat" id="baseftcat"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Future Year Model Facility Type Category</b></td>
+					<td style="font-size: 12; text-align: left;" class="futureftcat" id="futureftcat"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>Urban or Rural</b></td>
+					<td style="font-size: 12; text-align: left;" class="urbanorrural" id="urbanorrural"></td>
+				</tr>
+				<tr>
+					<td style="font-size: 12; text-align: left;"><b>2022 Daily Truck</b></td>
+					<td style="font-size: 12; text-align: left;" class="daily-truck-22" id="daily-truck-22"></td>
+				</tr>
+			</tbody>
+			</table>
+			<p style="font-size: 80%; text-align: center; color:rgb(73, 73, 73);"><i><br><br><br>Note: * The original base AADT or adopted model volumes have been revised by the user. Please use the output with caution.</i></p>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="bebr" role="tabpanel" aria-labelledby="pills-profile-tab">
+			<div id="bebr-table">
+			<table class="table" id="bebr_table" style="width: 80%;margin-left:auto;margin-right:auto;margin-top: 50px;">
+				<thead>
+					<tr>	
+						<th class="head-bebr" style="background-color: rgba(255, 255, 255, 0.4);"><i></i></th>
+						<th class="head-bebr" colspan="3" style="background-color: rgba(197, 197, 197, 0.4); vertical-align: middle; text-align: center;"><i>Population</i></th>
+						<th class="head-bebr" colspan="3" style="background-color: rgba(159, 160, 160, 0.4); vertical-align: middle; text-align: center;"><i>Households</i></th>
+					</tr>
+					<tr>
+						<th style="width: 10%;">County</th>
+						<th style="width: 15%; text-align: center;">2018</th>
+						<th style="width: 15%; text-align: center;">2023</th>
+						<th style="width: 15%; text-align: center;">AGR</th>
+						<th style="width: 15%; text-align: center;">2018</th>
+						<th style="width: 15%; text-align: center;">2023</th>
+						<th style="width: 15%; text-align: center;">AGR</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!--NOTE_: To update the BEBR Growth table, go to M:\D1\D1_Visualizer\BEBR and update excel file, then copy cell L3 and paste to HTML remove starting and ending quotes -->
+					<tr>
+						<td><b>Charlotte</b></td>
+						<td style='text-align: center;'>177,987</td>
+						<td style='text-align: center;'>204,126</td>
+						<td style='text-align: center;'>2.94%</td>
+						<td style='text-align: center;'>82,764</td>
+						<td style='text-align: center;'>94,145</td>
+						<td style='text-align: center;'>2.75%</td>
+					</tr>
+					<tr>
+						<td><b>Collier</b></td>
+						<td style='text-align: center;'>367,347</td>
+						<td style='text-align: center;'>399,480</td>
+						<td style='text-align: center;'>1.75%</td>
+						<td style='text-align: center;'>153,359</td>
+						<td style='text-align: center;'>168,524</td>
+						<td style='text-align: center;'>1.98%</td>
+					</tr>
+					<tr>
+						<td><b>DeSoto</b></td>
+						<td style='text-align: center;'>35,520</td>
+						<td style='text-align: center;'>34,974</td>
+						<td style='text-align: center;'>-0.31%</td>
+						<td style='text-align: center;'>11,818</td>
+						<td style='text-align: center;'>12,387</td>
+						<td style='text-align: center;'>0.96%</td>
+					</tr>
+					<tr>
+						<td><b>Glades</b></td>
+						<td style='text-align: center;'>13,002</td>
+						<td style='text-align: center;'>12,591</td>
+						<td style='text-align: center;'>-0.63%</td>
+						<td style='text-align: center;'>4,664</td>
+						<td style='text-align: center;'>4,446</td>
+						<td style='text-align: center;'>-0.93%</td>
+					</tr>
+					<tr>
+						<td><b>Hardee</b></td>
+						<td style='text-align: center;'>27,296</td>
+						<td style='text-align: center;'>25,645</td>
+						<td style='text-align: center;'>-1.21%</td>
+						<td style='text-align: center;'>8,266</td>
+						<td style='text-align: center;'>8,188</td>
+						<td style='text-align: center;'>-0.19%</td>
+					</tr>
+					<tr>
+						<td><b>Hendry</b></td>
+						<td style='text-align: center;'>39,586</td>
+						<td style='text-align: center;'>40,895</td>
+						<td style='text-align: center;'>0.66%</td>
+						<td style='text-align: center;'>12,539</td>
+						<td style='text-align: center;'>13,120</td>
+						<td style='text-align: center;'>0.93%</td>
+					</tr>
+					<tr>
+						<td><b>Highlands</b></td>
+						<td style='text-align: center;'>102,525</td>
+						<td style='text-align: center;'>104,385</td>
+						<td style='text-align: center;'>0.36%</td>
+						<td style='text-align: center;'>44,598</td>
+						<td style='text-align: center;'>45,899</td>
+						<td style='text-align: center;'>0.58%</td>
+					</tr>
+					<tr>
+						<td><b>Lee</b></td>
+						<td style='text-align: center;'>713,903</td>
+						<td style='text-align: center;'>800,989</td>
+						<td style='text-align: center;'>2.44%</td>
+						<td style='text-align: center;'>300,615</td>
+						<td style='text-align: center;'>335,747</td>
+						<td style='text-align: center;'>2.34%</td>
+					</tr>
+					<tr>
+						<td><b>Manatee</b></td>
+						<td style='text-align: center;'>377,826</td>
+						<td style='text-align: center;'>439,566</td>
+						<td style='text-align: center;'>3.27%</td>
+						<td style='text-align: center;'>159,557</td>
+						<td style='text-align: center;'>185,576</td>
+						<td style='text-align: center;'>3.26%</td>
+					</tr>
+					<tr>
+						<td><b>Okeechobee</b></td>
+						<td style='text-align: center;'>41,120</td>
+						<td style='text-align: center;'>39,591</td>
+						<td style='text-align: center;'>-0.74%</td>
+						<td style='text-align: center;'>14,439</td>
+						<td style='text-align: center;'>14,668</td>
+						<td style='text-align: center;'>0.32%</td>
+					</tr>
+					<tr>
+						<td><b>Polk</b></td>
+						<td style='text-align: center;'>673,028</td>
+						<td style='text-align: center;'>797,616</td>
+						<td style='text-align: center;'>3.70%</td>
+						<td style='text-align: center;'>254,857</td>
+						<td style='text-align: center;'>299,511</td>
+						<td style='text-align: center;'>3.50%</td>
+					</tr>
+					<tr>
+						<td><b>Sarasota</b></td>
+						<td style='text-align: center;'>417,442</td>
+						<td style='text-align: center;'>464,223</td>
+						<td style='text-align: center;'>2.24%</td>
+						<td style='text-align: center;'>194,868</td>
+						<td style='text-align: center;'>214,615</td>
+						<td style='text-align: center;'>2.03%</td>
+					</tr>
+					
+				</tbody>
+			</table>
+			
+			<p style="font-size: 80%; text-align: center; color:rgb(73, 73, 73);"><i><br><br><br>Note: AGR stands for Annual Growth Rate. Source - BEBR estimates (https://bebr.ufl.edu/)</i></p>
+		</div>
+
+	</div>
+	
+	
+	<!-- Leaflet Search Control -->
+	<script src="../src/leaflet-search.js"></script>
+	
+	<!-- Chart.js -->	
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.min.js"></script>
+
+	
+	<script type="text/javascript">
+		// NOTE_: update the map default view as needed, to grab lat lon, find location in google maps right click and get coordinates and paste below
+		var map = L.map('map').setView([27.18, -81.79], 9);
+
+		L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', 
+			{attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+			}).addTo(map);
+
+		
+		var year1 = [];
+		var year2 = [];
+		for (var i = 0; i < 51; i++){
+			if(i < 24) { // modify year
+				year1[i] = 2000 + i + '';
+			} 
+			year2[i] = 2000 + i + '';
+		}
+		
+		//data Chart
+		var LineChartData = {
+			labels: year1,
+			datasets: [
+				{
+					label: null,
+					borderColor: "#EF6950",
+					borderWidth: 0,
+					//borderDash: [5,5],
+					pointBackgroundColor: "#EF6950",
+					pointRadius: 6,
+					pointBorderWidth: 2,
+					//tension: 0.3,
+					data: null
+				},			
+				{
+					label: 'AADT',
+					fill: true,
+					borderColor: "#FDB45C",
+					borderWidth: 1.6,
+					pointBackgroundColor: "#FDB45C",
+					pointRadius: 4,
+					pointBorderWidth: 1,
+					tension: 0.3,
+					data: null
+				}
+			]
+		};
+		var ctx = document.getElementById("myChart").getContext("2d");
+		var myLineChart = new Chart(ctx, {
+			type: 'line',
+			data: LineChartData,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				},
+				plugins: {
+					legend: {
+						display: false,
+					}
+				}		
+			}
+		});
+	
+		//projection Chart
+		var LineChartData2 = {
+			labels: year2,
+			datasets: [
+				{
+					label: 'Based on Selected AADTs',
+					borderColor: "#1D6F42",
+					borderWidth: 1,
+					borderDash: [5,5],
+					pointBackgroundColor: "#1D6F42",
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					tension: 0.3,
+					data: null
+				},	
+				{
+					label: 'Based on 5-Year AADTs',
+					borderColor: "orange",
+					borderWidth: 1,
+					borderDash: [5,5],
+					pointBackgroundColor: "orange",
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					tension: 0.3,
+					data: null
+				},
+				{
+					label: 'Based on 10-Year AADTs',
+					borderColor: "#EF6950",
+					borderWidth: 1,
+					borderDash: [5,5],
+					pointBackgroundColor: "#EF6950", //"#FF7F50"
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					//backgroundColor: "rgba(220,220,220,0.2)",
+					tension: 0.3,
+					data: null
+				},
+				{
+					label: 'Based on TBRPM Volume',
+					borderColor: "#008CC4",
+					borderWidth: 1,
+					borderDash: [5,5],
+					pointBackgroundColor: "#008CC4",
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					tension: 0.3,
+					data: null
+				},
+				{
+					label: 'Base Year Capacity',
+					borderColor: "#808080",
+					borderWidth: 5,
+					borderDash: [15,15],
+					pointBackgroundColor: "#808080",
+					pointRadius: 0,
+					pointBorderWidth: 0,
+					tension: 0.3,
+					data: null
+				},
+				{
+					label: 'Future Year Capacity',
+					borderColor: "#000000",
+					borderWidth: 5,
+					pointBackgroundColor: "#000000",
+					pointRadius: 0,
+					pointBorderWidth: 0,
+					tension: 0.3,
+					data: null
+				}
+			]
+		};
+		var ctx2 = document.getElementById("projChart").getContext("2d");
+		var myLineChart2 = new Chart(ctx2, {
+			type: 'line',
+			data: LineChartData2,
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				},
+				plugins:{
+					legend: {
+						labels: {
+							usePointStyle: true,
+						},
+					}
+				}
+			}
+		});
+	
+		
+		//projection Chart
+		var nchrpChartData = {
+			labels: ['','','','','',''],
+			datasets: [
+					
+				{	
+					label: 'NCHRP 765 Difference',
+					borderColor: "orange",
+					borderWidth: 2,
+					borderDash: [5,2],
+					pointBackgroundColor: "orange",
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					data: null
+				},
+				{
+					label: 'NCHRP 765 Ratio',
+					borderColor: "#EF6950",
+					borderWidth: 2,
+					borderDash: [5,2],
+					pointBackgroundColor: "#EF6950", //"#FF7F50"
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					data: null
+				},
+				{
+					label: 'NCHRP 765 Average',
+					borderColor: "#008CC4",
+					borderWidth: 2,
+					borderDash: [5,2],
+					pointBackgroundColor: "#008CC4",
+					pointRadius: 3,
+					pointBorderWidth: 1,
+					data: null
+				},
+				{
+					label: 'Base Year Capacity',
+					borderColor: "#808080",
+					borderWidth: 5,
+					borderDash: [15,15],
+					pointBackgroundColor: "#808080",
+					pointRadius: 0,
+					pointBorderWidth: 0,
+					tension: 0.3,
+					data: null
+				},
+				{
+					label: 'Future Year Capacity',
+					borderColor: "#000000",
+					borderWidth: 5,
+					pointBackgroundColor: "#000000",
+					pointRadius: 0,
+					pointBorderWidth: 0,
+					tension: 0.3,
+					data: null
+				}
+			]
+		};
+		var ctx3 = document.getElementById("nchrpChart").getContext("2d");
+		var myLineChart3 = new Chart(ctx3, {
+			type: 'line',
+			data: nchrpChartData,
+			options: {
+				plugins:{
+					legend: {
+						labels: {
+							usePointStyle: true,
+						},
+					}
+				}
+			}
+		});
+	
+	
+	
+		// Update information inside division
+		var info_10 = L.control();
+			
+			info_10.onAdd = function (map) {
+				this._div = L.DomUtil.create('div', 'info');
+				this.update();
+				return this._div;
+			};
+			info_10.update = function (props) {
+				this._div.innerHTML = '<h4 align="center">District 1 Region</h4>' 
+					+ "Enter a <i><b> Cosite # </b></i> in the Search Box" + '<br><br>' 
+					+ (props ? '<b>'+'Cosite #: ' + props.COSITE : '</b>'+'Or click on a FTO station...');
+			};
+			info_10.addTo(map);
+			
+		function highlightFeature10(e) {
+			var layer = e.target;
+			layer.setStyle({
+				weight: 5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+			info_10.update(layer.feature.properties);
+		}
+	
+		function resetHighlight10(e) {
+			station.resetStyle(e.target);
+			info_10.update();
+		}
+
+		// get color function	
+		function getColor(d) {
+			return d > 1100     ?   '#7a0177' :
+				d > 800      ?   '#ae017e' :
+				d > 500      ?   '#dd3497' :
+				d > 300      ?   '#f768a1' :
+				d > 200      ?   '#fa9fb5' :
+				d > 100      ?   '#fcc5c0' :
+				d > 1        ?   '#feebe2' :
+									'Gray';
+		}
+		
+		//forecast function
+		function forecast(x, ky, kx){
+			var i=0, nr=0, dr=0, ax=0, ay=0, a=0, b=0;
+			
+			function average(array) {
+				var total = 0;
+				for (var i = 0; i< array.length; i++){
+					total += array[i];
+				}
+				return total/array.length;
+			}
+			ax = average(kx);
+			ay = average(ky);
+			for (i = 0; i < kx.length; i++){
+				nr = nr + ((kx[i]-ax) * (ky[i]-ay));
+				dr = dr + ((kx[i]-ax) * (kx[i]-ax))
+			}
+			if(kx.length < 2 || ky.length < 2 || !(ky.length === kx.length)){
+				return null;
+			}
+			b = nr/dr;
+			a = ay-b*ax;
+			return (a+b*x);
+		}
+				
+		function trendLine(Counts, Years){
+			var len = 100; //year 2000 - 2099
+		    var est = new Array(len);
+			for(var i = 0; i < len; i++){
+				est[i] = Math.round(Math.max(0, forecast(2000+i, Counts, Years))); // forecast
+			}
+			return est;
+		}
+		
+		function analysisYearAADT(year, Counts, Years){
+			if(year < 2000){
+				return null;
+			} else {
+				return RoundAADT(Math.max(0,forecast(year, Counts, Years))).toLocaleString();
+			}
+		}
+
+		function RoundAADT(d){
+			return d > 99999 ? 1000 * Math.round(d/1000) :
+				d > 9999 ? 500 * Math.round(d/500) :
+				d > 999 ? 100 * Math.round(d/100) :
+				d > 99 ? 50 * Math.round(d/50):
+				10 * Math.round(d/10);
+		}
+		
+		function saveValue(e){
+            var id = e.id;  // get the sender's id to save it . 
+            var val = e.value; // get the value. 
+            localStorage.setItem(id, val);// Every time user writing something, the localStorage's value will override. 
+        }
+		
+		function whenClicked(e) {
+			var clickProperty = e.target.feature.properties;
+			dataRefresh(clickProperty); //update data in the entire panel
+		}
+
+		
+		function dataRefresh(property){ //update data in the entire panel
+			var countYearPair = {}; // create a dictionary to store year, and aadt with flag and growth.
+			countYearPair["2000"] = {aadt: property.Y2000, flag: property.Y2000_FLG, growth: "NA"};
+			countYearPair["2001"] = {aadt: property.Y2001, flag: property.Y2001_FLG, growth: 0};
+			countYearPair["2002"] = {aadt: property.Y2002, flag: property.Y2002_FLG, growth: 0};
+			countYearPair["2003"] = {aadt: property.Y2003, flag: property.Y2003_FLG, growth: 0};
+			countYearPair["2004"] = {aadt: property.Y2004, flag: property.Y2004_FLG, growth: 0};
+			countYearPair["2005"] = {aadt: property.Y2005, flag: property.Y2005_FLG, growth: 0};
+			countYearPair["2006"] = {aadt: property.Y2006, flag: property.Y2006_FLG, growth: 0};
+			countYearPair["2007"] = {aadt: property.Y2007, flag: property.Y2007_FLG, growth: 0};
+			countYearPair["2008"] = {aadt: property.Y2008, flag: property.Y2008_FLG, growth: 0};
+			countYearPair["2009"] = {aadt: property.Y2009, flag: property.Y2009_FLG, growth: 0};
+			countYearPair["2010"] = {aadt: property.Y2010, flag: property.Y2010_FLG, growth: 0};
+			countYearPair["2011"] = {aadt: property.Y2011, flag: property.Y2011_FLG, growth: 0};
+			countYearPair["2012"] = {aadt: property.Y2012, flag: property.Y2012_FLG, growth: 0};
+			countYearPair["2013"] = {aadt: property.Y2013, flag: property.Y2013_FLG, growth: 0};
+			countYearPair["2014"] = {aadt: property.Y2014, flag: property.Y2014_FLG, growth: 0};
+			countYearPair["2015"] = {aadt: property.Y2015, flag: property.Y2015_FLG, growth: 0};
+			countYearPair["2016"] = {aadt: property.Y2016, flag: property.Y2016_FLG, growth: 0};
+			countYearPair["2017"] = {aadt: property.Y2017, flag: property.Y2017_FLG, growth: 0};			
+			countYearPair["2018"] = {aadt: property.Y2018, flag: property.Y2018_FLG, growth: 0};
+			countYearPair["2019"] = {aadt: property.Y2019, flag: property.Y2019_FLG, growth: 0};
+			countYearPair["2020"] = {aadt: property.Y2020, flag: property.Y2020_FLG, growth: 0};
+			countYearPair["2021"] = {aadt: property.Y2021, flag: property.Y2021_FLG, growth: 0};
+			countYearPair["2022"] = {aadt: property.Y2022, flag: property.Y2022_FLG, growth: 0};
+			countYearPair["2023"] = {aadt: property.Y2023, flag: property.Y2023_FLG, growth: 0};
+
+			
+		
+			historicalYear = Object.keys(countYearPair).map(function(item){
+				return parseInt(item, 10);
+			});
+
+			var historicalCount = [];
+			for(var key in countYearPair){
+				historicalCount.push(countYearPair[key].aadt);
+			}
+			
+			var AADT_flag = [];
+			for(var key in countYearPair){
+				AADT_flag.push(countYearPair[key].flag);
+			}
+			
+			//update the chart
+			myLineChart.data.datasets[0].data = null;
+			myLineChart.data.datasets[1].data = historicalCount;
+			myLineChart.update();
+			
+			//update the Cosite number
+			document.getElementById("chartsta").innerHTML = property.COSITE;
+			document.getElementById("k_fac").innerHTML = parseFloat(property.Y2022_K).toFixed(2);
+			document.getElementById("d_fac").innerHTML = parseFloat(property.Y2022_D).toFixed(2);
+			document.getElementById("t_fac").innerHTML = parseFloat(property.Y2022_T).toFixed(2);
+
+			//update Historical AADT table
+			const years = 24; //year 2000 - 2023 (modify year)
+			var id_aadt = new Array(years);
+			var id_growth = new Array(years);
+			var id_flag = new Array(years);
+			var annual_growth = new Array(years);
+			var id_checkbox = new Array(years);
+			
+			for (var i = 1; i < years; i++){
+				id_aadt[i] =  2000 + i + 'c';
+				id_growth[i] = 2000 + i + 'g';
+				id_flag[i] = 2000 + i + 'f';
+				id_checkbox[i] = 'check_' + (2000 + i);
+				annual_growth[i] = (historicalCount[i-1] === 0 || historicalCount[i-1] === null || historicalCount[i] === 0 || historicalCount[i] === null) ? "NA" 
+					: parseFloat(((historicalCount[i]/historicalCount[i-1]-1)*100).toFixed(2))+"%";
+				if(i === 1){
+					annual_growth[i] = "NA"; // No growth rate for the year 2001.
+				}
+			}
+			
+			for (var i = 1; i < years; i++){ //no 2000 data
+				document.getElementById(id_aadt[i]).innerHTML = historicalCount[i].toLocaleString();
+				document.getElementById(id_growth[i]).innerHTML = annual_growth[i];
+				document.getElementById(id_flag[i]).innerHTML = AADT_flag[i];
+				//document.getElementById(id_checkbox[i]).checked = false;
+			}
+			
+			var aadt_5 = historicalCount.slice(-5); //the last 5-year aadt (2019-2023)
+			var year_5 = historicalYear.slice(-5); //the last 5 years (2019-2023)
+			var i = 0;
+			while (i < aadt_5.length) {
+				if (aadt_5[i] === 0) { // remove years with 0 aadt
+					aadt_5.splice(i, 1);
+					year_5.splice(i, 1);
+				} else {
+					++i;
+				}
+			}
+			
+			var aadt_10 = historicalCount.slice(-10); //the last 10-year aadt (2011-2020)
+			var year_10 = historicalYear.slice(-10); //the last 10 years (2011-2020)
+			var i = 0;
+			while (i < aadt_10.length) { 
+				if (aadt_10[i] === 0) { // remove years with 0 aadt
+					aadt_10.splice(i, 1);
+					year_10.splice(i, 1);
+				} else {
+					++i;
+				}
+			}
+			
+			myLineChart2.data.datasets[1].data = trendLine(aadt_5, year_5).slice(0,51);
+			myLineChart2.data.datasets[2].data = trendLine(aadt_10, year_10).slice(0,51);
+			myLineChart2.data.datasets[3].data = trendLine([property.VOL15, property.VOL45], [2015, 2045]).slice(0,51);
+			myLineChart2.data.datasets[0].data = null;
+			myLineChart2.data.datasets[4].data = [property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
+			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
+			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
+			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
+			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
+			 										property.CAP15]; 
+			myLineChart2.data.datasets[5].data = [property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
+			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
+			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
+			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
+			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
+			 										property.CAP45]; 
+			myLineChart2.update();
+			
+			
+			//when click on a count station, update aadt projection table cells & nchrp table cells
+			var yr_0 = input_ExistingYear.value;
+			var yr_1 = input_OpeningYear.value;
+			var yr_2 = input_InterimYear.value;
+			var yr_3 = input_DesignYear.value;
+
+			// Update input - NEW
+			input_AADT.value = countYearPair[yr_0].aadt;
+			input_BaseVolume.value = property.VOL15;
+			input_FutureVolume.value = property.VOL45;
+			
+			document.getElementById("growth_selectedyr").innerHTML = "";
+			document.getElementById("opening_aadt_selectedyr").innerHTML = "";
+			document.getElementById("interim_aadt_selectedyr").innerHTML = "";
+			document.getElementById("design_aadt_selectedyr").innerHTML = "";	
+			
+			//------------  aadt projection table -------------
+			document.getElementById("growth_5yr").innerHTML = parseFloat(((trendLine(aadt_5, year_5)[21]/trendLine(aadt_5, year_5)[20]-1)*100).toFixed(2))+"%";		
+			document.getElementById("growth_10yr").innerHTML = parseFloat(((trendLine(aadt_10, year_10)[21]/trendLine(aadt_10, year_10)[20]-1)*100).toFixed(2))+"%"; 
+			document.getElementById("growth_tbrpm").innerHTML = parseFloat(((property.VOL45/property.VOL15-1)/30*100).toFixed(2))+"%";
+			
+			document.getElementById("opening_aadt_5yr").innerHTML = analysisYearAADT(yr_1, aadt_5, year_5);
+			document.getElementById("opening_aadt_10yr").innerHTML = analysisYearAADT(yr_1, aadt_10, year_10);
+			document.getElementById("opening_aadt_tbrpm").innerHTML = analysisYearAADT(yr_1, [property.VOL15, property.VOL45], [2015, 2045]);
+
+			document.getElementById("interim_aadt_5yr").innerHTML = analysisYearAADT(yr_2, aadt_5, year_5);
+			document.getElementById("interim_aadt_10yr").innerHTML = analysisYearAADT(yr_2, aadt_10, year_10);
+			document.getElementById("interim_aadt_tbrpm").innerHTML = analysisYearAADT(yr_2, [property.VOL15, property.VOL45], [2015, 2045]);
+			
+			document.getElementById("design_aadt_5yr").innerHTML = analysisYearAADT(yr_3, aadt_5, year_5);
+			document.getElementById("design_aadt_10yr").innerHTML = analysisYearAADT(yr_3, aadt_10, year_10);
+			document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [property.VOL15, property.VOL45], [2015, 2045]);
+
+			document.getElementById("chart2-opening").innerHTML = 'Opening Year ' + yr_1;
+			document.getElementById("chart2-interim").innerHTML = 'Interim Year ' + yr_2;
+			document.getElementById("chart2-design").innerHTML = 'Design Year ' + yr_3;
+
+			
+			//------------  nchrp procedure table -------------
+
+			document.getElementById("chart3-opening").innerHTML = 'Opening Year ' + yr_1;
+			document.getElementById("chart3-interim").innerHTML = 'Interim Year ' + yr_2;
+			document.getElementById("chart3-design").innerHTML = 'Design Year ' + yr_3;
+
+			yr0_vol = Math.round(Math.max(0,forecast(yr_0, [property.VOL15*property.MOCF, property.VOL45*property.MOCF], [2015, 2045])));
+			yr0_count = countYearPair[yr_0].aadt; 
+						
+			//NCHRP Report 765 Based on 2019 Data
+			m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
+			m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+			m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
+			
+			//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+			m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+			m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+			m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+			m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+			
+			document.getElementById("m5a-growth").innerHTML = parseFloat(m5a_growth*100).toFixed(2)+"%";
+			document.getElementById("m5a-opening").innerHTML = m5a_opening.toLocaleString();
+			document.getElementById("m5a-interim").innerHTML = m5a_interim.toLocaleString();
+			document.getElementById("m5a-design").innerHTML = m5a_design.toLocaleString();
+
+			//method 5a-r - Difference Rounded
+			m5a_r_growth = m5a_growth;
+			m5a_r_opening = RoundAADT(m5a_opening);
+			m5a_r_interim = RoundAADT(m5a_interim);
+			m5a_r_design = RoundAADT(m5a_design);
+			
+			document.getElementById("m5a-r-growth").innerHTML = parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+			document.getElementById("m5a-r-opening").innerHTML = m5a_r_opening.toLocaleString();
+			document.getElementById("m5a-r-interim").innerHTML = m5a_r_interim.toLocaleString();
+			document.getElementById("m5a-r-design").innerHTML = m5a_r_design.toLocaleString();
+			
+			//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+			m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+			m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+			m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+			m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));
+			
+			document.getElementById("m5b-growth").innerHTML = parseFloat(m5b_growth*100).toFixed(2)+"%";
+			document.getElementById("m5b-opening").innerHTML = m5b_opening.toLocaleString();
+			document.getElementById("m5b-interim").innerHTML = m5b_interim.toLocaleString();
+			document.getElementById("m5b-design").innerHTML = m5b_design.toLocaleString();
+			
+			//method 5b-r - Ratio Rounded
+			m5b_r_growth = m5b_growth;
+			m5b_r_opening = RoundAADT(m5b_opening);
+			m5b_r_interim = RoundAADT(m5b_interim);
+			m5b_r_design = RoundAADT(m5b_design);
+			
+			document.getElementById("m5b-r-growth").innerHTML = parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+			document.getElementById("m5b-r-opening").innerHTML = m5b_r_opening.toLocaleString();
+			document.getElementById("m5b-r-interim").innerHTML = m5b_r_interim.toLocaleString();
+			document.getElementById("m5b-r-design").innerHTML = m5b_r_design.toLocaleString();
+			
+			//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+			m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+			m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+			m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+			m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+			
+			document.getElementById("m6-growth").innerHTML = parseFloat(m6_growth*100).toFixed(2)+"%";
+			document.getElementById("m6-opening").innerHTML = m6_opening.toLocaleString();
+			document.getElementById("m6-interim").innerHTML = m6_interim.toLocaleString();
+			document.getElementById("m6-design").innerHTML = m6_design.toLocaleString();
+
+			//method 6-r - Ratio & Difference Rounded
+			m6_r_growth = (m6_growth);
+			m6_r_opening = RoundAADT(m6_opening);
+			m6_r_interim = RoundAADT(m6_interim);
+			m6_r_design = RoundAADT(m6_design);
+			
+			document.getElementById("m6-r-growth").innerHTML = parseFloat(m6_r_growth*100).toFixed(2)+"%";
+			document.getElementById("m6-r-opening").innerHTML = m6_r_opening.toLocaleString();
+			document.getElementById("m6-r-interim").innerHTML = m6_r_interim.toLocaleString();
+			document.getElementById("m6-r-design").innerHTML = m6_r_design.toLocaleString();
+
+			myLineChart3.data.labels = ['', input_ExistingYear.value, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+			myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+			myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+			myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+			myLineChart3.data.datasets[3].data = [null, property.CAP15, property.CAP15, property.CAP15, property.CAP15, null];
+			myLineChart3.data.datasets[4].data = [null, property.CAP45, property.CAP45, property.CAP45, property.CAP45, null];
+			myLineChart3.update();
+
+			//18 KIP Input Table
+			document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+			document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+			document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+			document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+			document.getElementById("count-1").innerHTML = Number(input_AADT.value).toLocaleString();
+			document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
+			document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
+			document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
+			if (property.LANE15 == 0) {
+				document.getElementById("basenumlanes").innerHTML = "NA";
+			} else {
+				document.getElementById("basenumlanes").innerHTML = property.LANE15;
+			}
+			if (property.LANE45 == 0) {
+				document.getElementById("futurenumlanes").innerHTML = "NA";
+			} else {
+				document.getElementById("futurenumlanes").innerHTML = property.LANE45;
+			}
+			document.getElementById("basefacltype").innerHTML = property.FT15;
+			document.getElementById("futurefacltype").innerHTML = property.FT45;
+			document.getElementById("baseftcat").innerHTML = property.FT15_Cat;
+			document.getElementById("futureftcat").innerHTML = property.FT45_Cat;
+			if (property.Urban == 1) {
+				document.getElementById("urbanorrural").innerHTML = "Urban";
+			} 
+			if (property.Urban == 0) {
+				document.getElementById("urbanorrural").innerHTML = "Rural";
+			}
+			
+			document.getElementById("daily-truck-22").innerHTML = parseFloat(property.Y2022_T).toFixed(2);
+			
+			//When the opening year is updated, table cells related to opening year, interim year and design year will be all updated
+			var input_opening = document.getElementById("input_OpeningYear");
+			input_opening.addEventListener("change", function(e) { 
+				var yr_1 = e.target.value;
+				yr_2 = parseInt(yr_1) + 10; //update interim year
+				yr_3 = parseInt(yr_1) + 20; //update design year
+				yr_0 = input_ExistingYear.value;
+				yr0_count = input_count.value; // 11-10-2023 manual base year aadt change should be captured as well
+
+				basevol = Number(input_BaseVolume.value);
+				futurevol = Number(input_FutureVolume.value);
+
+				document.getElementById("input_InterimYear").value = yr_2;
+				document.getElementById("input_DesignYear").value = yr_3;
+				
+				document.getElementById("chart2-opening").innerHTML = 'Opening Year ' + yr_1;
+				document.getElementById("chart2-interim").innerHTML = 'Interim Year ' + yr_2;
+				document.getElementById("chart2-design").innerHTML = 'Design Year ' + yr_3;
+
+				document.getElementById("opening_aadt_5yr").innerHTML = analysisYearAADT(yr_1, aadt_5, year_5);
+				document.getElementById("opening_aadt_10yr").innerHTML = analysisYearAADT(yr_1, aadt_10, year_10);
+				document.getElementById("opening_aadt_tbrpm").innerHTML = analysisYearAADT(yr_1, [basevol, futurevol], [2015, 2045]);
+								
+				document.getElementById("interim_aadt_5yr").innerHTML = analysisYearAADT(yr_2, aadt_5, year_5);
+				document.getElementById("interim_aadt_10yr").innerHTML = analysisYearAADT(yr_2, aadt_10, year_10);
+				document.getElementById("interim_aadt_tbrpm").innerHTML = analysisYearAADT(yr_2, [basevol, futurevol], [2015, 2045]);
+				
+				document.getElementById("design_aadt_5yr").innerHTML = analysisYearAADT(yr_3, aadt_5, year_5);
+				document.getElementById("design_aadt_10yr").innerHTML = analysisYearAADT(yr_3, aadt_10, year_10);
+				document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [basevol, futurevol], [2015, 2045]);
+				
+				//No need to update annual growth since existing year isn't updated.
+				document.getElementById("chart3-opening").innerHTML = 'Opening Year ' + yr_1
+				document.getElementById("chart3-interim").innerHTML = 'Interim Year ' + yr_2;
+				document.getElementById("chart3-design").innerHTML = 'Design Year ' + yr_3;
+
+				//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+				m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+				m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+				m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+				m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+				
+				//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+				m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+				m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+				m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+				m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));			
+				
+				//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+				m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+				m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+				m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+				m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+				
+				//method 5a-r - Difference Rounded
+				m5a_r_opening = RoundAADT(m5a_opening);
+				m5a_r_interim = RoundAADT(m5a_interim);
+				m5a_r_design = RoundAADT(m5a_design);
+				
+				//method 5b-r - Ratio Rounded
+				m5b_r_opening = RoundAADT(m5b_opening);
+				m5b_r_interim = RoundAADT(m5b_interim);
+				m5b_r_design = RoundAADT(m5b_design);
+				
+				//method 6-r - Ratio & Difference Rounded
+				m6_r_opening = RoundAADT(m6_opening);
+				m6_r_interim = RoundAADT(m6_interim);
+				m6_r_design = RoundAADT(m6_design);
+				
+				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+					document.getElementById("m5a-opening").innerHTML = Math.round(m5a_opening).toLocaleString();
+					document.getElementById("m5a-interim").innerHTML = Math.round(m5a_interim).toLocaleString();
+					document.getElementById("m5a-design").innerHTML = Math.round(m5a_design).toLocaleString();
+					document.getElementById("m5b-opening").innerHTML = Math.round(m5b_opening).toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = Math.round(m5b_interim).toLocaleString();
+					document.getElementById("m5b-design").innerHTML = Math.round(m5b_design).toLocaleString();
+					document.getElementById("m6-opening").innerHTML = Math.round(m6_opening).toLocaleString();
+					document.getElementById("m6-interim").innerHTML = Math.round(m6_interim).toLocaleString();
+					document.getElementById("m6-design").innerHTML = Math.round(m6_design).toLocaleString();
+					document.getElementById("m5a-r-opening").innerHTML = m5a_r_opening.toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = m5a_r_interim.toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = m5a_r_design.toLocaleString();
+					document.getElementById("m5b-r-opening").innerHTML = m5b_r_opening.toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = m5b_r_interim.toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = m5b_r_design.toLocaleString();
+					document.getElementById("m6-r-opening").innerHTML = m6_r_opening.toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = m6_r_interim.toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = m6_r_design.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
+				}
+				else{
+					document.getElementById("m5a-opening").innerHTML = "*"+Math.round(m5a_opening).toLocaleString();
+					document.getElementById("m5a-interim").innerHTML = "*"+Math.round(m5a_interim).toLocaleString();
+					document.getElementById("m5a-design").innerHTML = "*"+Math.round(m5a_design).toLocaleString();
+					document.getElementById("m5b-opening").innerHTML = "*"+Math.round(m5b_opening).toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = "*"+Math.round(m5b_interim).toLocaleString();
+					document.getElementById("m5b-design").innerHTML = "*"+Math.round(m5b_design).toLocaleString();
+					document.getElementById("m6-opening").innerHTML = "*"+Math.round(m6_opening).toLocaleString();
+					document.getElementById("m6-interim").innerHTML = "*"+Math.round(m6_interim).toLocaleString();
+					document.getElementById("m6-design").innerHTML = "*"+Math.round(m6_design).toLocaleString();
+					document.getElementById("m5a-r-opening").innerHTML = "*"+m5a_r_opening.toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+					document.getElementById("m5b-r-opening").innerHTML = "*"+m5b_r_opening.toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+					document.getElementById("m6-r-opening").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+				}
+				
+				myLineChart3.data.labels = ['', input_ExistingYear.value, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+				myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+				myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+				myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+				myLineChart3.update();
+
+				
+				
+			});
+			
+			//When the interim/design year is updated, only interim/design year related table cells will be all updated
+			var input_interim = document.getElementById("input_InterimYear");
+			input_interim.addEventListener("change", function(e){ //update interim year and corresponding aadt				
+				yr_2 = e.target.value;
+
+				basevol = Number(input_BaseVolume.value);
+				futurevol = Number(input_FutureVolume.value);
+
+				document.getElementById("input_InterimYear").value = yr_2;
+				
+				document.getElementById("chart2-interim").innerHTML = 'Interim Year ' + yr_2;
+
+				document.getElementById("interim_aadt_5yr").innerHTML = analysisYearAADT(yr_2, aadt_5, year_5);
+				document.getElementById("interim_aadt_10yr").innerHTML = analysisYearAADT(yr_2, aadt_10, year_10);
+				document.getElementById("interim_aadt_tbrpm").innerHTML = analysisYearAADT(yr_2, [basevol, futurevol], [2015, 2045]);
+
+				document.getElementById("chart3-interim").innerHTML = 'Interim Year ' + yr_2;
+
+				m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+				m5a_r_interim = RoundAADT(m5a_interim);
+				
+				m5b_interim = Math.round(yr0_count*(1 + m5b_growth*(yr_2-yr_0)));
+				m5b_r_interim = RoundAADT(m5b_interim);
+				
+				m6_interim = Math.round(yr0_count*(1 + m6_growth*(yr_2-yr_0)));
+				m6_r_interim = RoundAADT(m6_interim);
+				
+				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+					document.getElementById("m5a-interim").innerHTML = Math.round(m5a_interim).toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = m5a_r_interim.toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = Math.round(m5b_interim).toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = m5b_r_interim.toLocaleString();
+					document.getElementById("m6-interim").innerHTML = Math.round(m6_interim).toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = m6_r_interim.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
+				}
+				else{
+					document.getElementById("m5a-interim").innerHTML = "*"+Math.round(m5a_interim).toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = "*"+Math.round(m5b_interim).toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+					document.getElementById("m6-interim").innerHTML = "*"+Math.round(m6_interim).toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+				}
+				
+				myLineChart3.data.labels = ['', input_ExistingYear.value, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+				myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+				myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+				myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+				myLineChart3.update();
+
+			});
+
+			var input_design = document.getElementById("input_DesignYear");
+			input_design.addEventListener("change", function(e){ //update design year and corresponding aadt
+				yr_3 = e.target.value;
+
+				basevol = Number(input_BaseVolume.value);
+				futurevol = Number(input_FutureVolume.value);
+
+				document.getElementById("input_DesignYear").value = yr_3;
+				
+				document.getElementById("chart2-design").innerHTML = 'Design Year ' + yr_3;
+
+				document.getElementById("design_aadt_5yr").innerHTML = analysisYearAADT(yr_3, aadt_5, year_5);
+				document.getElementById("design_aadt_10yr").innerHTML = analysisYearAADT(yr_3, aadt_10, year_10);
+				document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [basevol, futurevol], [2015, 2045]);
+				
+				document.getElementById("chart3-design").innerHTML = 'Design Year ' + yr_3;
+
+				m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+				m5a_r_design = RoundAADT(m5a_design);
+
+				m5b_design = Math.round(yr0_count*(1 + m5b_growth*(yr_3-yr_0)));
+				m5b_r_design = RoundAADT(m5b_design);
+				
+				m6_design = Math.round(yr0_count*(1 + m6_growth*(yr_3-yr_0)));
+				m6_r_design = RoundAADT(m6_design);
+
+				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+					document.getElementById("m5a-design").innerHTML = Math.round(m5a_design).toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = m5a_r_design.toLocaleString();
+					document.getElementById("m5b-design").innerHTML = Math.round(m5b_design).toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = m5b_r_design.toLocaleString();
+					document.getElementById("m6-design").innerHTML = Math.round(m6_design).toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = m6_r_design.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
+				}
+				else{
+					document.getElementById("m5a-design").innerHTML = "*"+Math.round(m5a_design).toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+					document.getElementById("m5b-design").innerHTML = "*"+Math.round(m5b_design).toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+					document.getElementById("m6-design").innerHTML = "*"+Math.round(m6_design).toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+				}
+				
+				myLineChart3.data.labels = ['', input_ExistingYear.value, input_OpeningYear.value, input_InterimYear.value, yr_3, ''];
+				myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+				myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+				myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+				myLineChart3.update();
+
+			});
+
+
+			//Once the existing year is updated, all existing-year-related cells (in nchrp table) will be updated.
+			var input_exst = document.getElementById("input_ExistingYear");
+				input_exst.addEventListener("change", function(e){
+					
+					var yr_0 = e.target.value;
+					yr0_count = countYearPair[yr_0].aadt;
+					input_AADT.value = yr0_count;
+					basevol = Number(input_BaseVolume.value);
+					futurevol = Number(input_FutureVolume.value);
+					yr0_vol = Math.round(Math.max(0,forecast(yr_0, [basevol * property.MOCF, futurevol * property.MOCF], [2015, 2045])));
+					
+					var yr_1 = input_OpeningYear.value;
+					var yr_2 = input_InterimYear.value;
+					var yr_3 = input_DesignYear.value;
+		
+					//NCHRP Report 765 Based on 2019 Data
+					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
+					
+					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+					m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+					m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+					m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+					m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+					
+					//method 5a-r - Difference Rounded
+					m5a_r_growth = m5a_growth;
+					m5a_r_opening = RoundAADT(m5a_opening);
+					m5a_r_interim = RoundAADT(m5a_interim);
+					m5a_r_design = RoundAADT(m5a_design);
+
+					//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+					m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+					m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+					m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+					m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));
+
+					//method 5b-r - Ratio Rounded
+					m5b_r_growth = m5b_growth;
+					m5b_r_opening = RoundAADT(m5b_opening);
+					m5b_r_interim = RoundAADT(m5b_interim);
+					m5b_r_design = RoundAADT(m5b_design);
+					
+					//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+					m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+					m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+					m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+					m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+
+					//method 6-r - Ratio & Difference Rounded
+					m6_r_growth = (m6_growth);
+					m6_r_opening = RoundAADT(m6_opening);
+					m6_r_interim = RoundAADT(m6_interim);
+					m6_r_design = RoundAADT(m6_design);
+
+					if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+						document.getElementById("m5a-growth").innerHTML = parseFloat(m5a_growth*100).toFixed(2)+"%";
+						document.getElementById("m5a-opening").innerHTML = m5a_opening.toLocaleString();
+						document.getElementById("m5a-interim").innerHTML = m5a_interim.toLocaleString();
+						document.getElementById("m5a-design").innerHTML = m5a_design.toLocaleString();
+						document.getElementById("m5a-r-growth").innerHTML = parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m5a-r-opening").innerHTML = m5a_r_opening.toLocaleString();
+						document.getElementById("m5a-r-interim").innerHTML = m5a_r_interim.toLocaleString();
+						document.getElementById("m5a-r-design").innerHTML = m5a_r_design.toLocaleString();
+						document.getElementById("m5b-growth").innerHTML = parseFloat(m5b_growth*100).toFixed(2)+"%";
+						document.getElementById("m5b-opening").innerHTML = m5b_opening.toLocaleString();
+						document.getElementById("m5b-interim").innerHTML = m5b_interim.toLocaleString();
+						document.getElementById("m5b-design").innerHTML = m5b_design.toLocaleString();
+						document.getElementById("m5b-r-growth").innerHTML = parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m5b-r-opening").innerHTML = m5b_r_opening.toLocaleString();
+						document.getElementById("m5b-r-interim").innerHTML = m5b_r_interim.toLocaleString();
+						document.getElementById("m5b-r-design").innerHTML = m5b_r_design.toLocaleString();
+						document.getElementById("m6-growth").innerHTML = parseFloat(m6_growth*100).toFixed(2)+"%";
+						document.getElementById("m6-opening").innerHTML = m6_opening.toLocaleString();
+						document.getElementById("m6-interim").innerHTML = m6_interim.toLocaleString();
+						document.getElementById("m6-design").innerHTML = m6_design.toLocaleString();
+						document.getElementById("m6-r-growth").innerHTML = parseFloat(m6_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m6-r-opening").innerHTML = m6_r_opening.toLocaleString();
+						document.getElementById("m6-r-interim").innerHTML = m6_r_interim.toLocaleString();
+						document.getElementById("m6-r-design").innerHTML = m6_r_design.toLocaleString();
+						//18 KIP Input Table
+						document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+						document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+						document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+						document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+						document.getElementById("count-1").innerHTML = Number(input_AADT.value).toLocaleString();
+						document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
+						document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
+						document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
+					}
+					else{
+						document.getElementById("m5a-growth").innerHTML = "*"+parseFloat(m5a_growth*100).toFixed(2)+"%";
+						document.getElementById("m5a-opening").innerHTML = "*"+m5a_opening.toLocaleString();
+						document.getElementById("m5a-interim").innerHTML = "*"+m5a_interim.toLocaleString();
+						document.getElementById("m5a-design").innerHTML = "*"+m5a_design.toLocaleString();
+						document.getElementById("m5a-r-growth").innerHTML = "*"+parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m5a-r-opening").innerHTML = "*"+m5a_r_opening.toLocaleString();
+						document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+						document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+						document.getElementById("m5b-growth").innerHTML = "*"+parseFloat(m5b_growth*100).toFixed(2)+"%";
+						document.getElementById("m5b-opening").innerHTML = "*"+m5b_opening.toLocaleString();
+						document.getElementById("m5b-interim").innerHTML = "*"+m5b_interim.toLocaleString();
+						document.getElementById("m5b-design").innerHTML = "*"+m5b_design.toLocaleString();
+						document.getElementById("m5b-r-growth").innerHTML = "*"+parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m5b-r-opening").innerHTML = "*"+m5b_r_opening.toLocaleString();
+						document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+						document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+						document.getElementById("m6-growth").innerHTML = "*"+parseFloat(m6_growth*100).toFixed(2)+"%";
+						document.getElementById("m6-opening").innerHTML = "*"+m6_opening.toLocaleString();
+						document.getElementById("m6-interim").innerHTML = "*"+m6_interim.toLocaleString();
+						document.getElementById("m6-design").innerHTML = "*"+m6_design.toLocaleString();
+						document.getElementById("m6-r-growth").innerHTML = "*"+parseFloat(m6_r_growth*100).toFixed(2)+"%";
+						document.getElementById("m6-r-opening").innerHTML = "*"+m6_r_opening.toLocaleString();
+						document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+						document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+						//18 KIP Input Table
+						document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+						document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+						document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+						document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+						document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+						document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+						document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+						document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+					}
+		
+					myLineChart3.data.labels = ['', yr_0, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+					myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+					myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+					myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+					myLineChart3.update();
+				});
+
+			
+			// Once the AADT input is updated, all AADT-related cells (in nchrp table) will be updated. 
+			var input_count = document.getElementById("input_AADT");
+				input_count.addEventListener("change", function(e){
+					
+					var yr0_count = Number(e.target.value);
+					var yr_0 = input_ExistingYear.value;
+					basevol = Number(input_BaseVolume.value);
+					futurevol = Number(input_FutureVolume.value);
+					
+					
+					yr0_vol = Math.round(Math.max(0,forecast(yr_0, [basevol * property.MOCF, futurevol * property.MOCF], [2015, 2045])));
+					
+					var yr_1 = input_OpeningYear.value;
+					var yr_2 = input_InterimYear.value;
+					var yr_3 = input_DesignYear.value;
+					
+					//NCHRP Report 765 Based on 2019 Data
+					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
+					
+					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+					m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+					m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+					m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+					m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5a-growth").innerHTML = "*"+parseFloat(m5a_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-opening").innerHTML = "*"+m5a_opening.toLocaleString();
+					document.getElementById("m5a-interim").innerHTML = "*"+m5a_interim.toLocaleString();
+					document.getElementById("m5a-design").innerHTML = "*"+m5a_design.toLocaleString();
+
+					//method 5a-r - Difference Rounded
+					m5a_r_growth = m5a_growth;
+					m5a_r_opening = RoundAADT(m5a_opening);
+					m5a_r_interim = RoundAADT(m5a_interim);
+					m5a_r_design = RoundAADT(m5a_design);
+					
+					document.getElementById("m5a-r-growth").innerHTML = "*"+parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-r-opening").innerHTML = "*"+m5a_r_opening.toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+					
+					//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+					m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+					m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+					m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+					m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5b-growth").innerHTML = "*"+parseFloat(m5b_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-opening").innerHTML = "*"+m5b_opening.toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = "*"+m5b_interim.toLocaleString();
+					document.getElementById("m5b-design").innerHTML = "*"+m5b_design.toLocaleString();
+
+					//method 5b-r - Ratio Rounded
+					m5b_r_growth = m5b_growth;
+					m5b_r_opening = RoundAADT(m5b_opening);
+					m5b_r_interim = RoundAADT(m5b_interim);
+					m5b_r_design = RoundAADT(m5b_design);
+					
+					document.getElementById("m5b-r-growth").innerHTML = "*"+parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-r-opening").innerHTML = "*"+m5b_r_opening.toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+					
+					//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+					m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+					m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+					m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+					m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m6-growth").innerHTML = "*"+parseFloat(m6_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-opening").innerHTML = "*"+m6_opening.toLocaleString();
+					document.getElementById("m6-interim").innerHTML = "*"+m6_interim.toLocaleString();
+					document.getElementById("m6-design").innerHTML = "*"+m6_design.toLocaleString();
+
+					//method 6-r - Ratio & Difference Rounded
+					m6_r_growth = (m6_growth);
+					m6_r_opening = RoundAADT(m6_opening);
+					m6_r_interim = RoundAADT(m6_interim);
+					m6_r_design = RoundAADT(m6_design);
+					
+					document.getElementById("m6-r-growth").innerHTML = "*"+parseFloat(m6_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-r-opening").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+		
+					myLineChart3.data.labels = ['', yr_0, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+					myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+					myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+					myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+					myLineChart3.update();
+
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+					
+				});
+
+			// Once the Base Year Volume input is updated, all related cells will be updated. 
+			var input_base = document.getElementById("input_BaseVolume");
+				input_base.addEventListener("change", function(e){
+					
+					basevol = Number(e.target.value);
+					futurevol = Number(input_FutureVolume.value);
+					
+					var yr_0 = input_ExistingYear.value;
+					var yr0_count = Number(input_AADT.value);
+					
+					yr0_vol = Math.round(Math.max(0,forecast(yr_0, [basevol * property.MOCF, futurevol * property.MOCF], [2015, 2045])));
+					
+					var yr_1 = input_OpeningYear.value;
+					var yr_2 = input_InterimYear.value;
+					var yr_3 = input_DesignYear.value;
+
+					
+					//NCHRP Report 765 Based on 2019 Data
+					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
+					
+					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+					m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+					m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+					m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+					m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5a-growth").innerHTML = "*"+parseFloat(m5a_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-opening").innerHTML = "*"+m5a_opening.toLocaleString();
+					document.getElementById("m5a-interim").innerHTML = "*"+m5a_interim.toLocaleString();
+					document.getElementById("m5a-design").innerHTML = "*"+m5a_design.toLocaleString();
+
+					//method 5a-r - Difference Rounded
+					m5a_r_growth = m5a_growth;
+					m5a_r_opening = RoundAADT(m5a_opening);
+					m5a_r_interim = RoundAADT(m5a_interim);
+					m5a_r_design = RoundAADT(m5a_design);
+					
+					document.getElementById("m5a-r-growth").innerHTML = "*"+parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-r-opening").innerHTML = "*"+m5a_r_opening.toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+					
+					//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+					m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+					m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+					m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+					m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5b-growth").innerHTML = "*"+parseFloat(m5b_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-opening").innerHTML = "*"+m5b_opening.toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = "*"+m5b_interim.toLocaleString();
+					document.getElementById("m5b-design").innerHTML = "*"+m5b_design.toLocaleString();
+
+					//method 5b-r - Ratio Rounded
+					m5b_r_growth = m5b_growth;
+					m5b_r_opening = RoundAADT(m5b_opening);
+					m5b_r_interim = RoundAADT(m5b_interim);
+					m5b_r_design = RoundAADT(m5b_design);
+					
+					document.getElementById("m5b-r-growth").innerHTML = "*"+parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-r-opening").innerHTML = "*"+m5b_r_opening.toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+					
+					//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+					m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+					m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+					m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+					m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m6-growth").innerHTML = "*"+parseFloat(m6_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-opening").innerHTML = "*"+m6_opening.toLocaleString();
+					document.getElementById("m6-interim").innerHTML = "*"+m6_interim.toLocaleString();
+					document.getElementById("m6-design").innerHTML = "*"+m6_design.toLocaleString();
+
+					//method 6-r - Ratio & Difference Rounded
+					m6_r_growth = (m6_growth);
+					m6_r_opening = RoundAADT(m6_opening);
+					m6_r_interim = RoundAADT(m6_interim);
+					m6_r_design = RoundAADT(m6_design);
+					
+					document.getElementById("m6-r-growth").innerHTML = "*"+parseFloat(m6_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-r-opening").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+
+					document.getElementById("growth_tbrpm").innerHTML = "*"+parseFloat(((futurevol/basevol-1)/30*100).toFixed(2))+"%";
+					document.getElementById("opening_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_1, [basevol, futurevol], [2015, 2045]);
+					document.getElementById("interim_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_2, [basevol, futurevol], [2015, 2045]);
+					document.getElementById("design_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_3, [basevol, futurevol], [2015, 2045]);
+		
+					myLineChart3.data.labels = ['', yr_0, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+					myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+					myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+					myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+					myLineChart3.update();
+
+					myLineChart2.data.datasets[3].data = trendLine([basevol, futurevol], [2015, 2045]).slice(0,51);
+					myLineChart2.update();
+
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+					
+				});
+			
+			// Once the Future Year Volume input is updated, all related cells will be updated. 
+			var input_future = document.getElementById("input_FutureVolume");
+				input_future.addEventListener("change", function(e){
+					
+					futurevol = Number(e.target.value);
+					basevol = Number(input_BaseVolume.value);
+					
+					var yr_0 = input_ExistingYear.value;
+					var yr0_count = Number(input_AADT.value);
+					
+					yr0_vol = Math.round(Math.max(0,forecast(yr_0, [basevol * property.MOCF, futurevol * property.MOCF], [2015, 2045])));
+					
+					var yr_1 = input_OpeningYear.value;
+					var yr_2 = input_InterimYear.value;
+					var yr_3 = input_DesignYear.value;
+
+					
+					//NCHRP Report 765 Based on 2019 Data
+					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
+					
+					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
+					m5a_growth = (m5_6_2045diff/yr0_count-1)/(2045-yr_0);
+					m5a_opening = Math.round(yr0_count*(1+m5a_growth*(yr_1-yr_0)));
+					m5a_interim = Math.round(yr0_count*(1+m5a_growth*(yr_2-yr_0)));
+					m5a_design = Math.round(yr0_count*(1+m5a_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5a-growth").innerHTML = "*"+parseFloat(m5a_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-opening").innerHTML = "*"+m5a_opening.toLocaleString();
+					document.getElementById("m5a-interim").innerHTML = "*"+m5a_interim.toLocaleString();
+					document.getElementById("m5a-design").innerHTML = "*"+m5a_design.toLocaleString();
+
+					//method 5a-r - Difference Rounded
+					m5a_r_growth = m5a_growth;
+					m5a_r_opening = RoundAADT(m5a_opening);
+					m5a_r_interim = RoundAADT(m5a_interim);
+					m5a_r_design = RoundAADT(m5a_design);
+					
+					document.getElementById("m5a-r-growth").innerHTML = "*"+parseFloat(m5a_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5a-r-opening").innerHTML = "*"+m5a_r_opening.toLocaleString();
+					document.getElementById("m5a-r-interim").innerHTML = "*"+m5a_r_interim.toLocaleString();
+					document.getElementById("m5a-r-design").innerHTML = "*"+m5a_r_design.toLocaleString();
+					
+					//method 5b - NCHRP Report 765 Ratio-Smoothing Method Based on Existing Year Data (if model is overestimating in the Base Year)
+					m5b_growth = (m5_6_2045ratio/yr0_count-1)/(2045-yr_0);
+					m5b_opening = Math.round(yr0_count*(1+m5b_growth*(yr_1-yr_0)));
+					m5b_interim = Math.round(yr0_count*(1+m5b_growth*(yr_2-yr_0)));
+					m5b_design = Math.round(yr0_count*(1+m5b_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m5b-growth").innerHTML = "*"+parseFloat(m5b_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-opening").innerHTML = "*"+m5b_opening.toLocaleString();
+					document.getElementById("m5b-interim").innerHTML = "*"+m5b_interim.toLocaleString();
+					document.getElementById("m5b-design").innerHTML = "*"+m5b_design.toLocaleString();
+
+					//method 5b-r - Ratio Rounded
+					m5b_r_growth = m5b_growth;
+					m5b_r_opening = RoundAADT(m5b_opening);
+					m5b_r_interim = RoundAADT(m5b_interim);
+					m5b_r_design = RoundAADT(m5b_design);
+					
+					document.getElementById("m5b-r-growth").innerHTML = "*"+parseFloat(m5b_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m5b-r-opening").innerHTML = "*"+m5b_r_opening.toLocaleString();
+					document.getElementById("m5b-r-interim").innerHTML = "*"+m5b_r_interim.toLocaleString();
+					document.getElementById("m5b-r-design").innerHTML = "*"+m5b_r_design.toLocaleString();
+					
+					//method 6 - NCHRP Report 765 Ratio & Difference Smoothing Method Based on Existing Year Data
+					m6_growth = (m5_6_2045avg/yr0_count - 1)/(2045-yr_0);
+					m6_opening = Math.round(yr0_count*(1+m6_growth*(yr_1-yr_0)));
+					m6_interim = Math.round(yr0_count*(1+m6_growth*(yr_2-yr_0)));
+					m6_design = Math.round(yr0_count*(1+m6_growth*(yr_3-yr_0)));
+					
+					document.getElementById("m6-growth").innerHTML = "*"+parseFloat(m6_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-opening").innerHTML = "*"+m6_opening.toLocaleString();
+					document.getElementById("m6-interim").innerHTML = "*"+m6_interim.toLocaleString();
+					document.getElementById("m6-design").innerHTML = "*"+m6_design.toLocaleString();
+
+					//method 6-r - Ratio & Difference Rounded
+					m6_r_growth = (m6_growth);
+					m6_r_opening = RoundAADT(m6_opening);
+					m6_r_interim = RoundAADT(m6_interim);
+					m6_r_design = RoundAADT(m6_design);
+					
+					document.getElementById("m6-r-growth").innerHTML = "*"+parseFloat(m6_r_growth*100).toFixed(2)+"%";
+					document.getElementById("m6-r-opening").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("m6-r-interim").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("m6-r-design").innerHTML = "*"+m6_r_design.toLocaleString();
+
+					document.getElementById("growth_tbrpm").innerHTML = "*"+parseFloat(((futurevol/basevol-1)/30*100).toFixed(2))+"%";
+					document.getElementById("opening_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_1, [basevol, futurevol], [2015, 2045]);
+					document.getElementById("interim_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_2, [basevol, futurevol], [2015, 2045]);
+					document.getElementById("design_aadt_tbrpm").innerHTML = "*"+analysisYearAADT(yr_3, [basevol, futurevol], [2015, 2045]);
+		
+					myLineChart3.data.labels = ['', yr_0, input_OpeningYear.value, input_InterimYear.value, input_DesignYear.value, ''];
+					myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
+					myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
+					myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
+					myLineChart3.update();
+
+					myLineChart2.data.datasets[3].data = trendLine([basevol, futurevol], [2015, 2045]).slice(0,51);
+					myLineChart2.update();
+
+					//18 KIP Input Table
+					document.getElementById("year-1").innerHTML = input_ExistingYear.value.toLocaleString();
+					document.getElementById("year-2").innerHTML = input_OpeningYear.value.toLocaleString();
+					document.getElementById("year-3").innerHTML = input_InterimYear.value.toLocaleString();
+					document.getElementById("year-4").innerHTML = input_DesignYear.value.toLocaleString();
+					document.getElementById("count-1").innerHTML = "*"+Number(input_AADT.value).toLocaleString();
+					document.getElementById("count-2").innerHTML = "*"+m6_r_opening.toLocaleString();
+					document.getElementById("count-3").innerHTML = "*"+m6_r_interim.toLocaleString();
+					document.getElementById("count-4").innerHTML = "*"+m6_r_design.toLocaleString();
+					
+				});
+
+
+			//checkbox function
+			var selections = [];
+			var checkboxElems = document.querySelectorAll("input[type='checkbox']");
+			checkboxElems.forEach(el => el.checked = false);
+
+			for (var i = 0; i < checkboxElems.length; i++) {
+				checkboxElems[i].addEventListener("change", displayCheck);
+			}
+			function displayCheck(e){
+				if (e.target.checked) {
+					selections[e.target.id] = {
+						year: e.target.id.substring(6)
+					};
+				}
+				else {
+					delete selections[e.target.id];
+				}
+				
+				var updatedCounts = [];
+				var updatedYears = [];
+				for (var key in selections) {
+					updatedCounts.push(countYearPair[selections[key].year].aadt);
+					updatedYears.push(parseInt(selections[key].year, 10));
+				}
+				
+				highLightCounts = Array(21).fill(null);
+				for (var i = 0; i < updatedYears.length; i++) {
+					for (var j = 0; j < year1.length; j++) {
+						if (updatedYears[i] === parseInt(year1[j])) {
+							highLightCounts[j] = updatedCounts[i];
+						}
+					}
+				}
+				myLineChart.data.datasets[0].data = highLightCounts;
+				myLineChart.update();
+				
+				var selected_year_est = trendLine(updatedCounts, updatedYears);
+				myLineChart2.data.datasets[0].data = selected_year_est.slice(0,51);
+				myLineChart2.update();
+				
+				document.getElementById("growth_selectedyr").innerHTML = (selected_year_est[20] === 0) 
+				? parseFloat(((selected_year_est[1]/selected_year_est[0]-1)*100).toFixed(2))+"%"
+				: parseFloat(((selected_year_est[21]/selected_year_est[20]-1)*100).toFixed(2))+"%";
+				
+				document.getElementById("opening_aadt_selectedyr").innerHTML = analysisYearAADT(input_OpeningYear.value, updatedCounts, updatedYears);
+				document.getElementById("interim_aadt_selectedyr").innerHTML = analysisYearAADT(input_InterimYear.value, updatedCounts, updatedYears);
+				document.getElementById("design_aadt_selectedyr").innerHTML = analysisYearAADT(input_DesignYear.value, updatedCounts, updatedYears);
+				document.getElementById("count-s-1").innerHTML = analysisYearAADT(input_ExistingYear.value, updatedCounts, updatedYears);
+				document.getElementById("count-s-2").innerHTML = analysisYearAADT(input_OpeningYear.value, updatedCounts, updatedYears);
+				document.getElementById("count-s-3").innerHTML = analysisYearAADT(input_InterimYear.value, updatedCounts, updatedYears);
+				document.getElementById("count-s-4").innerHTML = analysisYearAADT(input_DesignYear.value, updatedCounts, updatedYears);
+
+				var input_existing = document.getElementById("input_ExistingYear");
+				input_existing.addEventListener("change", function(e){
+					yr = e.target.value;
+					document.getElementById("count-s-1").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+				});
+				
+				var input_opn = document.getElementById("input_OpeningYear");
+				input_opn.addEventListener("change", function(e){
+					yr = e.target.value;
+					document.getElementById("opening_aadt_selectedyr").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+					document.getElementById("interim_aadt_selectedyr").innerHTML = analysisYearAADT(parseInt(yr)+10, updatedCounts, updatedYears);
+					document.getElementById("design_aadt_selectedyr").innerHTML = analysisYearAADT(parseInt(yr)+20, updatedCounts, updatedYears);
+					document.getElementById("count-s-2").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+					document.getElementById("count-s-3").innerHTML = analysisYearAADT(parseInt(yr)+10, updatedCounts, updatedYears);
+					document.getElementById("count-s-4").innerHTML = analysisYearAADT(parseInt(yr)+20, updatedCounts, updatedYears);
+				});
+				
+				var input_intrm = document.getElementById("input_InterimYear");
+				input_intrm.addEventListener("change", function(e){
+					yr = e.target.value;
+					document.getElementById("interim_aadt_selectedyr").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+					document.getElementById("count-s-3").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+				});
+				
+				var input_desg = document.getElementById("input_DesignYear");
+				input_desg.addEventListener("change", function(e){
+					yr = e.target.value;
+					document.getElementById("design_aadt_selectedyr").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+					document.getElementById("count-s-4").innerHTML = analysisYearAADT(yr, updatedCounts, updatedYears);
+				});
+			}
+		}
+		
+		//on each feature function		
+		function onEachFeature(feature, layer) {
+		    layer.on({
+			    mouseover: highlightFeature10,
+				mouseout: resetHighlight10,
+			    click: whenClicked});
+				
+			var popupContent = "<p style='line-height: 1.5em'> <i><b>Cosite #:</b></i> " + feature.properties.COSITE + '<br>' 
+					+'<i><b>Description:</b></i>&nbsp; '+ feature.properties.DESC_ + '<br>' 
+					// +'<i><b>2022 AADT:</b></i> '+ feature.properties.Y2022 + '<br>'
+					+'<i><b>2022 K Factor:</b></i>&nbsp;'+ feature.properties.Y2022_K + '<br>'
+					+'<i><b>2022 D Factor:</b></i>&nbsp;'+ feature.properties.Y2022_D + '<br>'
+					+'<i><b>2022 T Factor:</b></i>&nbsp;'+ feature.properties.Y2022_T + '<br>'
+					+'<i><b>Source:</b></i>&nbsp; '+ feature.properties.SOURCE  + '<br>'
+					+'<i><b>TBRPM:</b></i>&nbsp; '+ feature.properties.TBRPM + "</p>" ;
+
+			if (feature.properties && feature.properties.popupContent) {
+				popupContent += feature.properties.popupContent;
+			}
+
+			layer.bindPopup(popupContent);
+		}
+
+
+		//export target #table_id into a csv
+		function download_csv_1(table_id) {
+			var csv = [];
+			var rows = document.querySelectorAll('table#' + table_id + ' tr');	
+			
+			for (var i = 0; i < rows.length; i++) {
+				var row = [];
+				cols = rows[i].querySelectorAll('td, th');
+				for (var j = 0; j < cols.length; j++) {
+					row.push('"' + cols[j].innerText + '"');
+				}
+				csv.push(row.join(","));
+			}
+			var csv_string = csv.join("\n");
+			
+			// Download it
+			var cosite = document.getElementById("chartsta").innerHTML;
+			var filename = cosite + '_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+			var link = document.createElement('a');
+			link.style.display = 'none';
+			link.setAttribute('target', '_blank');
+			link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+		
+		function download_csv_2(table_id) {
+			var csv = ["Note: Values with an asterisk(*) are based on user's base year AADT and/or adopted model volume input. Please use the output with caution.,", ',Based on Selected AADTs, Based on the Last 5-Year AADTs, Based on the Last 10-Year AADTs, Based on TBRPM Volume'];
+			var rows = document.querySelectorAll('table#' + table_id + ' tr');	
+			
+			for (var i = 1; i < rows.length; i++) {
+				var row = [];
+				cols = rows[i].querySelectorAll('td, th');
+				for (var j = 0; j < cols.length; j++) {
+					row.push('"' + cols[j].innerText + '"');
+				}
+				csv.push(row.join(","));
+			}
+			var csv_string = csv.join("\n");
+			
+			// Download it
+			var cosite = document.getElementById("chartsta").innerHTML;
+			var filename = cosite + '_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+			var link = document.createElement('a');
+			link.style.display = 'none';
+			link.setAttribute('target', '_blank');
+			link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+
+		function download_csv_3(table_id) {
+			var csv = ["Note: Values with an asterisk(*) are based on user's base year AADT and/or adopted model volume input. Please use the output with caution.,", ',NCHRP 765 (Based on Base Year),', ', Difference, Difference (rounded), Ratio, Ration (rounded), Ratio & Difference, Ratio & Difference (rounded)'];
+			var rows = document.querySelectorAll('table#' + table_id + ' tr');	
+			
+			for (var i = 2; i < rows.length; i++) {
+				var row = [];
+				cols = rows[i].querySelectorAll('td, th');
+				for (var j = 0; j < cols.length; j++) {
+					row.push('"' + cols[j].innerText + '"');
+				}
+				csv.push(row.join(","));
+			}
+			var csv_string = csv.join("\n");
+			
+			// Download it
+			var cosite = document.getElementById("chartsta").innerHTML;
+			var filename = cosite + '_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+			var link = document.createElement('a');
+			link.style.display = 'none';
+			link.setAttribute('target', '_blank');
+			link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+		
+		
+		function selectElementContents(el) {
+			var body = document.body, range, sel;
+			if (document.createRange && window.getSelection) {
+				range = document.createRange();
+				sel = window.getSelection();
+				sel.removeAllRanges();
+				try {
+					range.selectNodeContents(el);
+					sel.addRange(range);
+				} catch (e) {
+					range.selectNode(el);
+					sel.addRange(range);
+				}
+				document.execCommand("copy");
+	
+			} else if (body.createTextRange) {
+				range = body.createTextRange();
+				range.moveToElementText(el);
+				range.select();
+				range.execCommand("Copy");
+			}
+		}		
+
+		var station = L.geoJson(geo, {
+			style: function (feature) {
+				return feature.properties && feature.properties.style;
+			},
+
+			onEachFeature: onEachFeature,
+
+			pointToLayer: function (feature, latlng) {
+				if(feature.properties.SOURCE == "FDOT"){
+				    return L.circleMarker(latlng, {
+					radius: 4,
+					fillColor: "#F7A53C",
+					color: "#000",
+					weight: 1,
+					opacity: 1,
+					fillOpacity: 0.8
+				});
+				}
+				if(feature.properties.SOURCE == "County"){
+				    return L.circleMarker(latlng, {
+					radius: 4,
+					fillColor: "#40B7F2",
+					color: "#000",
+					weight: 1,
+					opacity: 1,
+					fillOpacity: 0.8
+				});
+				}
+				else{
+					return L.circleMarker(latlng, {
+					radius: 4,
+					fillColor: "#93C572",
+					color: "#000",
+					weight: 1,
+					opacity: 1,
+					fillOpacity: 0.8
+				});
+				
+				}
+			}
+		}).addTo(map);
+
+
+		// search control
+		var searchControl = new L.Control.Search({
+			layer: station, 
+			propertyName: 'COSITE', 
+			autoCollapse:true,
+			moveToLocation: function(latlng, title, map) {
+				//map.fitBounds( latlng.layer.getBounds() );
+					var zoom = map.getBoundsZoom(latlng.layer.getBounds());
+					map.setView(latlng, zoom); // access the zoom
+					}});
+	
+		searchControl.on('search:locationfound', function(e) {
+		
+			var searchProperty = e.layer.feature.properties;
+			
+			dataRefresh(searchProperty); //update data in the entire panel
+						
+			e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
+			if(e.layer._popup)
+				e.layer.openPopup();
+		}).on('search:collapsed', function(e) {
+			station.eachLayer(function(layer) {	//restore feature color
+				station.resetStyle(layer);
+			});	
+		});
+		
+		map.addControl(searchControl);  //inizialize search control
+
+	</script>
+
+</body>
+</html>
