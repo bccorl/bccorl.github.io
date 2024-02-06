@@ -33,7 +33,7 @@
 
 <!-- Geojson -->
 <!-- NOTE_: Update the geojson file name below -->
-	<script type="text/javascript" src="../geojson/Visualizer_08012023.geojson"></script>
+	<script type="text/javascript" src="../geojson/D1_FTO_test.geojson"></script>
 
 </head>
 <body>
@@ -284,7 +284,7 @@
 			<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" type="button" aria-expanded="false" style="color: black;">Count Source</a>
 			<ul class="dropdown-menu">
 				<!-- NOTE_: update html file names, comment out layers that are not in use -->
-			  <li><a class="dropdown-item" href="D1_aadt_proj_v1-FDOT.html">FDOT Count</a></li>
+			  <li><a class="dropdown-item" href="D1_aadt_proj_v1.html">FDOT Count</a></li>
 			  <!-- <li><a class="dropdown-item" href="D1_aadt_proj_v1-COUNTY.html">County Count</a></li> -->
 			  <!-- <li><a class="dropdown-item" href="D1_aadt_proj_v1-STUDY.html">Study Count</a></li> -->
 			</ul>
@@ -379,7 +379,7 @@
 						<th class="est_sel proj_table" style="width: 20%">Based on Selected AADTs</th>
 						<th class="est_five proj_table" style="width: 22%">Based on the Last 5-Year AADTs</th>
 						<th class="est_ten proj_table" style="width: 23%">Based on the Last 10-Year AADTs</th>
-						<th class="est_tbrpm proj_table" style="width: 18%">Based on TBRPM Volume</th>
+						<th class="est_tbrpm proj_table" style="width: 18%">Based on D1RPM Volume</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -545,13 +545,13 @@
 					<td style="font-size: 12; text-align: left;" class="futurefacltype" id="futurefacltype"></td>
 				</tr>
 				<tr>
-					<td style="font-size: 12; text-align: left;"><b>Base Year Model Facility Type Category</b></td>
-					<td style="font-size: 12; text-align: left;" class="baseftcat" id="baseftcat"></td>
+					<td style="font-size: 12; text-align: left;"><b>Base Year Model Area Type</b></td>
+					<td style="font-size: 12; text-align: left;" class="baseat" id="baseat"></td>
 				</tr>
 				<tr>
-					<td style="font-size: 12; text-align: left;"><b>Future Year Model Facility Type Category</b></td>
-					<td style="font-size: 12; text-align: left;" class="futureftcat" id="futureftcat"></td>
-				</tr>
+					<td style="font-size: 12; text-align: left;"><b>Future Year Model Area Type</b></td>
+					<td style="font-size: 12; text-align: left;" class="futureat" id="futureat"></td>
+				</tr> 
 				<tr>
 					<td style="font-size: 12; text-align: left;"><b>Urban or Rural</b></td>
 					<td style="font-size: 12; text-align: left;" class="urbanorrural" id="urbanorrural"></td>
@@ -714,7 +714,7 @@
 	
 	<script type="text/javascript">
 		// NOTE_: update the map default view as needed, to grab lat lon, find location in google maps right click and get coordinates and paste below
-		var map = L.map('map').setView([27.18, -81.79], 9);
+		var map = L.map('map').setView([27.18, -81.79], 8);
 
 		L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', 
 			{attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
@@ -815,7 +815,7 @@
 					data: null
 				},
 				{
-					label: 'Based on TBRPM Volume',
+					label: 'Based on D1RPM Volume',
 					borderColor: "#008CC4",
 					borderWidth: 1,
 					borderDash: [5,5],
@@ -1104,7 +1104,7 @@
 			document.getElementById("t_fac").innerHTML = parseFloat(property.Y2022_T).toFixed(2);
 
 			//update Historical AADT table
-			const years = 24; //year 2000 - 2023 (modify year)
+			const years = 24; //year 2000 - 2023 (modify year if needed) NOTE_
 			var id_aadt = new Array(years);
 			var id_growth = new Array(years);
 			var id_flag = new Array(years);
@@ -1156,20 +1156,20 @@
 			
 			myLineChart2.data.datasets[1].data = trendLine(aadt_5, year_5).slice(0,51);
 			myLineChart2.data.datasets[2].data = trendLine(aadt_10, year_10).slice(0,51);
-			myLineChart2.data.datasets[3].data = trendLine([property.VOL15, property.VOL45], [2015, 2045]).slice(0,51);
+			myLineChart2.data.datasets[3].data = trendLine([property.VOL_15, property.VOL_45], [2015, 2045]).slice(0,51);
 			myLineChart2.data.datasets[0].data = null;
-			myLineChart2.data.datasets[4].data = [property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
-			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
-			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
-			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
-			 										property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,property.CAP15,
-			 										property.CAP15]; 
-			myLineChart2.data.datasets[5].data = [property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
-			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
-			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
-			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
-			 										property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,property.CAP45,
-			 										property.CAP45]; 
+			myLineChart2.data.datasets[4].data = [property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,
+			 										property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,
+			 										property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,
+			 										property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,
+			 										property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,property.CAP_15,
+			 										property.CAP_15]; 
+			myLineChart2.data.datasets[5].data = [property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,
+			 										property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,
+			 										property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,
+			 										property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,
+			 										property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,property.CAP_45,
+			 										property.CAP_45]; 
 			myLineChart2.update();
 			
 			
@@ -1181,8 +1181,8 @@
 
 			// Update input - NEW
 			input_AADT.value = countYearPair[yr_0].aadt;
-			input_BaseVolume.value = property.VOL15;
-			input_FutureVolume.value = property.VOL45;
+			input_BaseVolume.value = property.VOL_15;
+			input_FutureVolume.value = property.VOL_45;
 			
 			document.getElementById("growth_selectedyr").innerHTML = "";
 			document.getElementById("opening_aadt_selectedyr").innerHTML = "";
@@ -1192,19 +1192,19 @@
 			//------------  aadt projection table -------------
 			document.getElementById("growth_5yr").innerHTML = parseFloat(((trendLine(aadt_5, year_5)[21]/trendLine(aadt_5, year_5)[20]-1)*100).toFixed(2))+"%";		
 			document.getElementById("growth_10yr").innerHTML = parseFloat(((trendLine(aadt_10, year_10)[21]/trendLine(aadt_10, year_10)[20]-1)*100).toFixed(2))+"%"; 
-			document.getElementById("growth_tbrpm").innerHTML = parseFloat(((property.VOL45/property.VOL15-1)/30*100).toFixed(2))+"%";
+			document.getElementById("growth_tbrpm").innerHTML = parseFloat(((property.VOL_45/property.VOL_15-1)/30*100).toFixed(2))+"%";
 			
 			document.getElementById("opening_aadt_5yr").innerHTML = analysisYearAADT(yr_1, aadt_5, year_5);
 			document.getElementById("opening_aadt_10yr").innerHTML = analysisYearAADT(yr_1, aadt_10, year_10);
-			document.getElementById("opening_aadt_tbrpm").innerHTML = analysisYearAADT(yr_1, [property.VOL15, property.VOL45], [2015, 2045]);
+			document.getElementById("opening_aadt_tbrpm").innerHTML = analysisYearAADT(yr_1, [property.VOL_15, property.VOL_45], [2015, 2045]);
 
 			document.getElementById("interim_aadt_5yr").innerHTML = analysisYearAADT(yr_2, aadt_5, year_5);
 			document.getElementById("interim_aadt_10yr").innerHTML = analysisYearAADT(yr_2, aadt_10, year_10);
-			document.getElementById("interim_aadt_tbrpm").innerHTML = analysisYearAADT(yr_2, [property.VOL15, property.VOL45], [2015, 2045]);
+			document.getElementById("interim_aadt_tbrpm").innerHTML = analysisYearAADT(yr_2, [property.VOL_15, property.VOL_45], [2015, 2045]);
 			
 			document.getElementById("design_aadt_5yr").innerHTML = analysisYearAADT(yr_3, aadt_5, year_5);
 			document.getElementById("design_aadt_10yr").innerHTML = analysisYearAADT(yr_3, aadt_10, year_10);
-			document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [property.VOL15, property.VOL45], [2015, 2045]);
+			document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [property.VOL_15, property.VOL_45], [2015, 2045]);
 
 			document.getElementById("chart2-opening").innerHTML = 'Opening Year ' + yr_1;
 			document.getElementById("chart2-interim").innerHTML = 'Interim Year ' + yr_2;
@@ -1217,12 +1217,12 @@
 			document.getElementById("chart3-interim").innerHTML = 'Interim Year ' + yr_2;
 			document.getElementById("chart3-design").innerHTML = 'Design Year ' + yr_3;
 
-			yr0_vol = Math.round(Math.max(0,forecast(yr_0, [property.VOL15*property.MOCF, property.VOL45*property.MOCF], [2015, 2045])));
+			yr0_vol = Math.round(Math.max(0,forecast(yr_0, [property.VOL_15*property.MOCF, property.VOL_45*property.MOCF], [2015, 2045])));
 			yr0_count = countYearPair[yr_0].aadt; 
 						
 			//NCHRP Report 765 Based on 2019 Data
-			m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
-			m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+			m5_6_2045ratio = yr0_count*(property.VOL_45*property.MOCF/yr0_vol);
+			m5_6_2045diff = yr0_count+(property.VOL_45*property.MOCF-yr0_vol);
 			m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
 			
 			//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
@@ -1295,8 +1295,8 @@
 			myLineChart3.data.datasets[0].data = [null, yr0_count, m5a_opening, m5a_interim, m5a_design, null];
 			myLineChart3.data.datasets[1].data = [null, yr0_count, m5b_opening, m5b_interim, m5b_design, null];
 			myLineChart3.data.datasets[2].data = [null, yr0_count, m6_opening, m6_interim, m6_design, null];
-			myLineChart3.data.datasets[3].data = [null, property.CAP15, property.CAP15, property.CAP15, property.CAP15, null];
-			myLineChart3.data.datasets[4].data = [null, property.CAP45, property.CAP45, property.CAP45, property.CAP45, null];
+			myLineChart3.data.datasets[3].data = [null, property.CAP_15, property.CAP_15, property.CAP_15, property.CAP_15, null];
+			myLineChart3.data.datasets[4].data = [null, property.CAP_45, property.CAP_45, property.CAP_45, property.CAP_45, null];
 			myLineChart3.update();
 
 			//18 KIP Input Table
@@ -1308,20 +1308,22 @@
 			document.getElementById("count-2").innerHTML = m6_r_opening.toLocaleString();
 			document.getElementById("count-3").innerHTML = m6_r_interim.toLocaleString();
 			document.getElementById("count-4").innerHTML = m6_r_design.toLocaleString();
-			if (property.LANE15 == 0) {
+			if (property.NUMLANES_1 == 0) {
 				document.getElementById("basenumlanes").innerHTML = "NA";
 			} else {
-				document.getElementById("basenumlanes").innerHTML = property.LANE15;
+				document.getElementById("basenumlanes").innerHTML = property.NUMLANES_1;
 			}
-			if (property.LANE45 == 0) {
+			if (property.NUMLANES_4 == 0) {
 				document.getElementById("futurenumlanes").innerHTML = "NA";
 			} else {
-				document.getElementById("futurenumlanes").innerHTML = property.LANE45;
+				document.getElementById("futurenumlanes").innerHTML = property.NUMLANES_4;
 			}
-			document.getElementById("basefacltype").innerHTML = property.FT15;
-			document.getElementById("futurefacltype").innerHTML = property.FT45;
-			document.getElementById("baseftcat").innerHTML = property.FT15_Cat;
-			document.getElementById("futureftcat").innerHTML = property.FT45_Cat;
+			document.getElementById("basefacltype").innerHTML = property.FT_DESC_15;
+			document.getElementById("futurefacltype").innerHTML = property.FT_DESC_45; 
+			
+			document.getElementById("baseat").innerHTML = property.AT_DESC_15;
+			document.getElementById("futureat").innerHTML = property.AT_DESC_45;
+			
 			if (property.Urban == 1) {
 				document.getElementById("urbanorrural").innerHTML = "Urban";
 			} 
@@ -1363,7 +1365,7 @@
 				document.getElementById("design_aadt_tbrpm").innerHTML = analysisYearAADT(yr_3, [basevol, futurevol], [2015, 2045]);
 				
 				//No need to update annual growth since existing year isn't updated.
-				document.getElementById("chart3-opening").innerHTML = 'Opening Year ' + yr_1
+				document.getElementById("chart3-opening").innerHTML = 'Opening Year ' + yr_1;
 				document.getElementById("chart3-interim").innerHTML = 'Interim Year ' + yr_2;
 				document.getElementById("chart3-design").innerHTML = 'Design Year ' + yr_3;
 
@@ -1400,7 +1402,7 @@
 				m6_r_interim = RoundAADT(m6_interim);
 				m6_r_design = RoundAADT(m6_design);
 				
-				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+				if (basevol == property.VOL_15 & futurevol == property.VOL_45 & input_AADT.value == countYearPair[yr_0].aadt){
 					document.getElementById("m5a-opening").innerHTML = Math.round(m5a_opening).toLocaleString();
 					document.getElementById("m5a-interim").innerHTML = Math.round(m5a_interim).toLocaleString();
 					document.getElementById("m5a-design").innerHTML = Math.round(m5a_design).toLocaleString();
@@ -1496,7 +1498,7 @@
 				m6_interim = Math.round(yr0_count*(1 + m6_growth*(yr_2-yr_0)));
 				m6_r_interim = RoundAADT(m6_interim);
 				
-				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+				if (basevol == property.VOL_15 & futurevol == property.VOL_45 & input_AADT.value == countYearPair[yr_0].aadt){
 					document.getElementById("m5a-interim").innerHTML = Math.round(m5a_interim).toLocaleString();
 					document.getElementById("m5a-r-interim").innerHTML = m5a_r_interim.toLocaleString();
 					document.getElementById("m5b-interim").innerHTML = Math.round(m5b_interim).toLocaleString();
@@ -1565,7 +1567,7 @@
 				m6_design = Math.round(yr0_count*(1 + m6_growth*(yr_3-yr_0)));
 				m6_r_design = RoundAADT(m6_design);
 
-				if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+				if (basevol == property.VOL_15 & futurevol == property.VOL_45 & input_AADT.value == countYearPair[yr_0].aadt){
 					document.getElementById("m5a-design").innerHTML = Math.round(m5a_design).toLocaleString();
 					document.getElementById("m5a-r-design").innerHTML = m5a_r_design.toLocaleString();
 					document.getElementById("m5b-design").innerHTML = Math.round(m5b_design).toLocaleString();
@@ -1625,8 +1627,8 @@
 					var yr_3 = input_DesignYear.value;
 		
 					//NCHRP Report 765 Based on 2019 Data
-					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
-					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045ratio = yr0_count*(property.VOL_45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL_45*property.MOCF-yr0_vol);
 					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
 					
 					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
@@ -1665,7 +1667,7 @@
 					m6_r_interim = RoundAADT(m6_interim);
 					m6_r_design = RoundAADT(m6_design);
 
-					if (basevol == property.VOL15 & futurevol == property.VOL45 & input_AADT.value == countYearPair[yr_0].aadt){
+					if (basevol == property.VOL_15 & futurevol == property.VOL_45 & input_AADT.value == countYearPair[yr_0].aadt){
 						document.getElementById("m5a-growth").innerHTML = parseFloat(m5a_growth*100).toFixed(2)+"%";
 						document.getElementById("m5a-opening").innerHTML = m5a_opening.toLocaleString();
 						document.getElementById("m5a-interim").innerHTML = m5a_interim.toLocaleString();
@@ -1761,8 +1763,8 @@
 					var yr_3 = input_DesignYear.value;
 					
 					//NCHRP Report 765 Based on 2019 Data
-					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
-					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045ratio = yr0_count*(property.VOL_45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL_45*property.MOCF-yr0_vol);
 					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
 					
 					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
@@ -1867,8 +1869,8 @@
 
 					
 					//NCHRP Report 765 Based on 2019 Data
-					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
-					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045ratio = yr0_count*(property.VOL_45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL_45*property.MOCF-yr0_vol);
 					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
 					
 					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
@@ -1981,8 +1983,8 @@
 
 					
 					//NCHRP Report 765 Based on 2019 Data
-					m5_6_2045ratio = yr0_count*(property.VOL45*property.MOCF/yr0_vol);
-					m5_6_2045diff = yr0_count+(property.VOL45*property.MOCF-yr0_vol);
+					m5_6_2045ratio = yr0_count*(property.VOL_45*property.MOCF/yr0_vol);
+					m5_6_2045diff = yr0_count+(property.VOL_45*property.MOCF-yr0_vol);
 					m5_6_2045avg = (m5_6_2045ratio+m5_6_2045diff)/2;
 					
 					//method 5a - NCHRP Report 765 Difference-Smoothing Method Based on Existing Year Data (if model is underestimating in the Base Year)
@@ -2176,8 +2178,7 @@
 					+'<i><b>2022 K Factor:</b></i>&nbsp;'+ feature.properties.Y2022_K + '<br>'
 					+'<i><b>2022 D Factor:</b></i>&nbsp;'+ feature.properties.Y2022_D + '<br>'
 					+'<i><b>2022 T Factor:</b></i>&nbsp;'+ feature.properties.Y2022_T + '<br>'
-					+'<i><b>Source:</b></i>&nbsp; '+ feature.properties.SOURCE  + '<br>'
-					+'<i><b>TBRPM:</b></i>&nbsp; '+ feature.properties.TBRPM + "</p>" ;
+					+'<i><b>Source:</b></i>&nbsp; '+ feature.properties.SOURCE  + "</p>" ;
 
 			if (feature.properties && feature.properties.popupContent) {
 				popupContent += feature.properties.popupContent;
@@ -2216,7 +2217,7 @@
 		}
 		
 		function download_csv_2(table_id) {
-			var csv = ["Note: Values with an asterisk(*) are based on user's base year AADT and/or adopted model volume input. Please use the output with caution.,", ',Based on Selected AADTs, Based on the Last 5-Year AADTs, Based on the Last 10-Year AADTs, Based on TBRPM Volume'];
+			var csv = ["Note: Values with an asterisk(*) are based on user's base year AADT and/or adopted model volume input. Please use the output with caution.,", ',Based on Selected AADTs, Based on the Last 5-Year AADTs, Based on the Last 10-Year AADTs, Based on D1RPM Volume'];
 			var rows = document.querySelectorAll('table#' + table_id + ' tr');	
 			
 			for (var i = 1; i < rows.length; i++) {
